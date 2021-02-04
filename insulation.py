@@ -50,18 +50,20 @@ FclToEnv = 0.72
 kAir = 0.024
 kClo = 0.047
 # m
-thickAir = 1*10**(-3)
+thickAir = 2*10**(-3)
 thickClo = 0.5*10**(-3)
 
 qRS = sigma * TBody ** 4
 qRE = sigma * TEnv ** 4
 
 X,Y,Z = [],[],[]
+Epsilon = []
 
 for TEnv in range(TEnvLow,TEnvHigh):
     tauCloList = []
     rhoCloList = []
     hConvCEList = []
+    epsilonCloList = []
     qRE = sigma * TEnv ** 4
 
     for tauClo in np.linspace(0, 1, 101):
@@ -69,6 +71,8 @@ for TEnv in range(TEnvLow,TEnvHigh):
             if (tauClo + rhoClo) > 1:
                 continue
             epsilonClo = 1 - tauClo - rhoClo
+            if(epsilonClo<0 or epsilonClo > 1):
+                continue
             A = -sigma*epsilonClo
             B = 0
             C = 0
@@ -88,27 +92,29 @@ for TEnv in range(TEnvLow,TEnvHigh):
             qRCloTwo = sigma*TCloTwo**4
             qConvCE = Metab - tauClo*qRS+(epsilonClo-rhoClo)*qRE - qRCloTwo
             hConvCE = qConvCE/(TCloTwo - TEnv)
-            if(hConvCE <= 0 or hConvCE > 50 ):
+            if(hConvCE <= 0 or hConvCE > 15 ):
                 continue
             tauCloList.append(tauClo)
             rhoCloList.append(rhoClo)
             hConvCEList.append(hConvCE)
+            epsilonCloList.append(epsilonClo)
+
     xtau = np.array(tauCloList)
     yrho = np.array(rhoCloList)
     zhconv = np.array(hConvCEList)
+    epcl = np.array(epsilonCloList)
     X.append(xtau)
     Y.append(yrho)
     Z.append(zhconv)
-    # print(xtau.shape)
-    # ax.plot_trisurf(xtau,yrho,zhconv)
-    # ax.set_xlabel('tau')
-    # ax.set_ylabel('rho')
-    # ax.set_zlabel('hConv')
-    # ax.set_title("Max TEnv: "+str(TEnv)+"K")
+    Epsilon.append(epcl)
 plots = zip(X,Y,Z)
+for idx,itm in enumerate(X):
+    print(len(itm))
 print(X)
 print(Y)
-print(Z)
+print(Epsilon)
+# print(Z)
+
 
 def loop_plot(plots,len):
     figs = plt.figure()
@@ -116,10 +122,11 @@ def loop_plot(plots,len):
     for idx, plot in enumerate(plots):
         ax=figs.add_subplot(1,len,idx+1, projection='3d')
         try:
-            ax.plot_trisurf(plot[0],plot[1],plot[2])
+            # ax.plot_trisurf(plot[0],plot[1],plot[2])
+            ax.scatter(plot[0], plot[1], plot[2])
         except RuntimeError:
             continue
-        ax.set_title("Max TEnv: "+str(273+16+1+idx)+"K")
+        ax.set_title("Max TEnv: "+str(TEnvLow+1+idx)+"K")
         if(xyLabel):
             ax.set_xlabel('tau')
             ax.set_ylabel('rho')
