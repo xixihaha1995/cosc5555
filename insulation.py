@@ -1,6 +1,7 @@
 import numpy as np
 import fqs
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import scipy
 import scipy.interpolate
 
@@ -25,10 +26,8 @@ ax = plt.axes(projection='3d')
 # constants
 # degree C
 TBody = 34 + 273
-TEnv = 24 + 273
+TEnv = 26 + 273
 Metab = 58
-TSummer = [x for x in range(20, 27)]
-TWinter = [x for x in range(12, 20)]
 # watts/K/m2
 qBar = 58.2
 # sigma unit W*(m^-2)*(K^-4)
@@ -53,87 +52,70 @@ thickClo = 0.5*10**(-3)
 
 qRE = sigma*TEnv**4
 qRS = sigma*TBody**4
-tauCloList = []
-rhoCloList = []
-hConvCEList = []
-for tauClo in np.linspace(0, 1, 101):
-    for rhoClo in np.linspace(0, 1, 101):
-        if (tauClo + rhoClo) > 1:
-            continue
-        epsilonClo = 1 - tauClo - rhoClo
-        A = -sigma*epsilonClo
-        B = 0
-        C = 0
-        D = -1*kAir/thickAir
-        E = kAir/thickAir*(TBody)-tauClo*qRE + (epsilonClo - rhoClo) * qRS - Metab
-        p = np.array([[A, B, C, D, E]])
-        try:
-            TCloOneRoots = fqs.quartic_roots(p)
-        except ZeroDivisionError:
-            continue
-        if (TCloOneRoots[0][1].real > 0):
-            TCloOne = TCloOneRoots[0][1].real
-        else:
-            continue
-        TCloTwo = TCloOne - Metab/kClo*thickClo
-        # print("TCloOne:"+str(TCloOne)+", TCloTwo:"+ str(TCloTwo))
-        qRCloTwo = sigma*TCloTwo**4
-        qConvCE = Metab - tauClo*qRS+(epsilonClo-rhoClo)*qRE - qRCloTwo
-        hConvCE = qConvCE/(TCloTwo - TEnv)
-        if(hConvCE <= 0 or hConvCE > 50 ):
-            continue
-        tauCloList.append(tauClo)
-        rhoCloList.append(rhoClo)
-        hConvCEList.append(hConvCE)
+X,Y,Z = [],[],[]
 
-print(tauCloList)
-print(rhoCloList)
-print(sorted(hConvCEList))
-xtau = np.array(tauCloList)
-yrho = np.array(rhoCloList)
-zhconv = np.array(hConvCEList)
-print(xtau.shape)
-
-# points = np.append(xtau,yrho)
-# # X = [xtau]
-# # Y = [yrho]
-# # Z = [zhconv]
-# #
-# # # zhConv = np.array(hConvCEList)
-# #
-# # ax.plot_surface(X, Y, Z)
-# print(xtau.shape)
-#
-# xi = np.linspace(0, 1, num=xtau.shape[0])
-# yi = np.linspace(0, 1, num=xtau.shape)
-#
-# zi = scipy.interpolate.griddata(points, hConvCEList, (xi, yi),method='linear')
-# ax.plot_surface(xi, yi, zi)
-# ax.set_xlabel('tau')
-# ax.set_ylabel('rho')
-# ax.set_zlabel('hConv')
-# ax.set_title("Max TEnv: "+str(TEnv))
-# plt.show()
+for TEnv in range(273+16,273+26):
+    tauCloList = []
+    rhoCloList = []
+    hConvCEList = []
+    for tauClo in np.linspace(0, 1, 101):
+        for rhoClo in np.linspace(0, 1, 101):
+            if (tauClo + rhoClo) > 1:
+                continue
+            epsilonClo = 1 - tauClo - rhoClo
+            A = -sigma*epsilonClo
+            B = 0
+            C = 0
+            D = -1*kAir/thickAir
+            E = kAir/thickAir*(TBody)-tauClo*qRE + (epsilonClo - rhoClo) * qRS - Metab
+            p = np.array([[A, B, C, D, E]])
+            try:
+                TCloOneRoots = fqs.quartic_roots(p)
+            except ZeroDivisionError:
+                continue
+            if (TCloOneRoots[0][1].real > 0):
+                TCloOne = TCloOneRoots[0][1].real
+            else:
+                continue
+            TCloTwo = TCloOne - Metab/kClo*thickClo
+            # print("TCloOne:"+str(TCloOne)+", TCloTwo:"+ str(TCloTwo))
+            qRCloTwo = sigma*TCloTwo**4
+            qConvCE = Metab - tauClo*qRS+(epsilonClo-rhoClo)*qRE - qRCloTwo
+            hConvCE = qConvCE/(TCloTwo - TEnv)
+            if(hConvCE <= 0 or hConvCE > 50 ):
+                continue
+            tauCloList.append(tauClo)
+            rhoCloList.append(rhoClo)
+            hConvCEList.append(hConvCE)
+    xtau = np.array(tauCloList)
+    yrho = np.array(rhoCloList)
+    zhconv = np.array(hConvCEList)
+    X.append(xtau)
+    Y.append(yrho)
+    Z.append(zhconv)
+    # print(xtau.shape)
+    # ax.plot_trisurf(xtau,yrho,zhconv)
+    # ax.set_xlabel('tau')
+    # ax.set_ylabel('rho')
+    # ax.set_zlabel('hConv')
+    # ax.set_title("Max TEnv: "+str(TEnv)+"K")
+print(X)
+print(Y)
+plots = zip(X,Y,Z)
+def loop_plot(plots,len):
+    figs = plt.figure()
+    for idx, plot in enumerate(plots):
+        ax=figs.add_subplot(1,len,idx+1, projection='3d')
+        ax.plot_trisurf(plot[0],plot[1],plot[2])
+    return figs
+figs = loop_plot(plots,len(X))
+plt.show()
 
 
 
 
 
 
-
-
-#For winter
-# rhoClo = 0.9
-#
-#
-# for TEnv in TSummer:
-#     tauClo = 0.03
-#     rhoClo = 1 - epsilonClo - tauClo
-#     qRadSkin = FskToCl*sigma*(TBody+273)**4
-#     qRadEnv = FEnvToCl*sigma*(TEnv+273)**4
-#     qTemp = epsilonClo*qRadSkin - rhoClo*qRadSkin - tauClo * qRadEnv
-#
-#     print(qTemp)
 
 
 
