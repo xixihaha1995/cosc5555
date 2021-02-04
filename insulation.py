@@ -26,9 +26,10 @@ ax = plt.axes(projection='3d')
 # constants
 # degree C
 TBody = 34 + 273
-
-TEnvLow = 20 + 273
-TEnvHigh = 26 + 273
+TEnv = 26+273
+#
+# TEnvLow = 20 + 273
+# TEnvHigh = 26 + 273
 Metab = 58
 # watts/K/m2
 qBar = 58.2
@@ -56,7 +57,7 @@ qRS = sigma * TBody ** 4
 
 X,Y,Z = [],[],[]
 
-for TEnv in range(TEnvLow,TEnvHigh):
+for TEnv in range(16+273,26+273):
     tauCloList = []
     rhoCloList = []
     hConvCEList = []
@@ -109,14 +110,14 @@ def loop_plot(plots,len):
     for idx, plot in enumerate(plots):
         ax=figs.add_subplot(1,len,idx+1, projection='3d')
         ax.plot_trisurf(plot[0],plot[1],plot[2])
-        ax.set_title("Max TEnv: "+str(273+16+1+idx)+"K")
+        # ax.set_title("Max TEnv: "+str(273+16+1+idx)+"K")
         if(idx == 0):
             ax.set_xlabel('tau')
             ax.set_ylabel('rho')
             ax.set_zlabel('hConv')
     return figs
 figs = loop_plot(plots,len(X))
-figs.savefig("TEnv from "+str(TEnvLow) +"K to "+str(TEnvHigh)+"K.png")
+# figs.savefig("TEnv from "+str(TEnvLow) +"K to "+str(TEnvHigh)+"K.png")
 plt.show()
 
 
