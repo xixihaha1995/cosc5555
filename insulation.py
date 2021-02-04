@@ -25,7 +25,7 @@ ax = plt.axes(projection='3d')
 # constants
 # degree C
 TBody = 34 + 273
-TEnv = 26 + 273
+TEnv = 24 + 273
 Metab = 58
 TSummer = [x for x in range(20, 27)]
 TWinter = [x for x in range(12, 20)]
@@ -56,8 +56,8 @@ qRS = sigma*TBody**4
 tauCloList = []
 rhoCloList = []
 hConvCEList = []
-for tauClo in np.linspace(0, 1, 11):
-    for rhoClo in np.linspace(0, 1, 11):
+for tauClo in np.linspace(0, 1, 101):
+    for rhoClo in np.linspace(0, 1, 101):
         if (tauClo + rhoClo) > 1:
             continue
         epsilonClo = 1 - tauClo - rhoClo
@@ -80,19 +80,20 @@ for tauClo in np.linspace(0, 1, 11):
         qRCloTwo = sigma*TCloTwo**4
         qConvCE = Metab - tauClo*qRS+(epsilonClo-rhoClo)*qRE - qRCloTwo
         hConvCE = qConvCE/(TCloTwo - TEnv)
-        if(hConvCE <= 0):
+        if(hConvCE <= 0 or hConvCE > 50 ):
             continue
         tauCloList.append(tauClo)
         rhoCloList.append(rhoClo)
         hConvCEList.append(hConvCE)
 
-
+print(tauCloList)
+print(rhoCloList)
+print(sorted(hConvCEList))
 xtau = np.array(tauCloList)
 yrho = np.array(rhoCloList)
 zhconv = np.array(hConvCEList)
-print(tauCloList)
-print(rhoCloList)
-print(hConvCEList)
+print(xtau.shape)
+
 # points = np.append(xtau,yrho)
 # # X = [xtau]
 # # Y = [yrho]
