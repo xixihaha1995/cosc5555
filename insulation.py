@@ -28,8 +28,8 @@ ax = plt.axes(projection='3d')
 TBody = 34 + 273
 TEnv = 26+273
 #
-# TEnvLow = 20 + 273
-# TEnvHigh = 26 + 273
+TEnvLow = 20 + 273
+TEnvHigh = 26 + 273
 Metab = 58
 # watts/K/m2
 qBar = 58.2
@@ -54,10 +54,11 @@ thickAir = 1*10**(-3)
 thickClo = 0.5*10**(-3)
 
 qRS = sigma * TBody ** 4
+qRE = sigma * TEnv ** 4
 
 X,Y,Z = [],[],[]
 
-for TEnv in range(16+273,26+273):
+for TEnv in range(TEnvLow,TEnvHigh):
     tauCloList = []
     rhoCloList = []
     hConvCEList = []
@@ -105,16 +106,25 @@ for TEnv in range(16+273,26+273):
     # ax.set_zlabel('hConv')
     # ax.set_title("Max TEnv: "+str(TEnv)+"K")
 plots = zip(X,Y,Z)
+print(X)
+print(Y)
+print(Z)
+
 def loop_plot(plots,len):
     figs = plt.figure()
+    xyLabel = True
     for idx, plot in enumerate(plots):
         ax=figs.add_subplot(1,len,idx+1, projection='3d')
-        ax.plot_trisurf(plot[0],plot[1],plot[2])
-        # ax.set_title("Max TEnv: "+str(273+16+1+idx)+"K")
-        if(idx == 0):
+        try:
+            ax.plot_trisurf(plot[0],plot[1],plot[2])
+        except RuntimeError:
+            continue
+        ax.set_title("Max TEnv: "+str(273+16+1+idx)+"K")
+        if(xyLabel):
             ax.set_xlabel('tau')
             ax.set_ylabel('rho')
             ax.set_zlabel('hConv')
+            xyLabel =False
     return figs
 figs = loop_plot(plots,len(X))
 # figs.savefig("TEnv from "+str(TEnvLow) +"K to "+str(TEnvHigh)+"K.png")
