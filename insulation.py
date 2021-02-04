@@ -26,13 +26,13 @@ ax = plt.axes(projection='3d')
 # constants
 # degree C
 TBody = 34 + 273
-TEnv = 22+273
+# TEnv = 22+273
 #
-TEnvLow = 26 + 273
+TEnvLow = 22 + 273
 TEnvHigh = 30 + 273
 Metab = 58
 # watts/K/m2
-qBar = 58.2
+qBar = 28
 # sigma unit W*(m^-2)*(K^-4)
 sigma = 5.67*10**(-8)
 epsilonSkin = 1
@@ -50,7 +50,7 @@ FclToEnv = 0.72
 kAir = 0.024
 kClo = 0.047
 # m
-thickAir = 2.36*10**(-3)
+thickAir = 2*10**(-3)
 thickClo = 0.5*10**(-3)
 
 qRS = sigma * TBody ** 4
@@ -66,10 +66,10 @@ for TEnv in range(TEnvLow,TEnvHigh):
     epsilonCloList = []
     qRE = sigma * TEnv ** 4
 
-    for tauClo in np.linspace(0, 1, 1):
-        tauClo = 0.03
-        for rhoClo in np.linspace(0, 1, 10):
-            # rhoClo = 0.3
+    for tauClo in np.linspace(0, 1, 101):
+        # tauClo = 0.99
+        for rhoClo in np.linspace(0, 1, 101):
+            # rhoClo = 0.001
             if (tauClo + rhoClo) > 1:
                 continue
             epsilonClo = 1 - tauClo - rhoClo
@@ -85,16 +85,16 @@ for TEnv in range(TEnvLow,TEnvHigh):
                 TCloOneRoots = fqs.quartic_roots(p)
             except ZeroDivisionError:
                 continue
-            if (TCloOneRoots[0][1].real > 0):
+            if (TCloOneRoots[0][1].real > 0 and TCloOneRoots[0][1].real > TEnv):
                 TCloOne = TCloOneRoots[0][1].real
             else:
                 continue
             TCloTwo = TCloOne - Metab/kClo*thickClo
-            # print("TCloOne:"+str(TCloOne)+", TCloTwo:"+ str(TCloTwo))
-            qRCloTwo = sigma*TCloTwo**4
+            print("TCloOne:"+str(TCloOne)+", TCloTwo:"+ str(TCloTwo)+", TEnv:"+ str(TEnv))
+            qRCloTwo = epsilonClo *sigma*TCloTwo**4
             qConvCE = Metab - tauClo*qRS+(epsilonClo-rhoClo)*qRE - qRCloTwo
             hConvCE = qConvCE/(TCloTwo - TEnv)
-            if(hConvCE <= 3 or hConvCE > 30 ):
+            if(hConvCE <= 0 or hConvCE >13 ):
                 continue
             tauCloList.append(tauClo)
             rhoCloList.append(rhoClo)
@@ -119,7 +119,7 @@ for idx,itm in enumerate(X):
 
 
 def loop_plot(plots,len):
-    figs = plt.figure()
+    figs = plt.figure(figsize=(20, 20))
     xyLabel = True
     for idx, plot in enumerate(plots):
         ax=figs.add_subplot(1,len,idx+1, projection='3d')
@@ -128,7 +128,7 @@ def loop_plot(plots,len):
             ax.scatter(plot[0], plot[1], plot[2],marker="o")
         except RuntimeError:
             continue
-        ax.set_title("Max TEnv: "+str(TEnvLow+1+idx)+"K")
+        ax.set_title("TEnv: "+str(TEnvLow+1+idx)+"K")
         if(xyLabel):
             ax.set_xlabel('tau')
             ax.set_ylabel('rho')
