@@ -26,10 +26,10 @@ ax = plt.axes(projection='3d')
 # constants
 # degree C
 TBody = 34 + 273
-TEnv = 26+273
+TEnv = 22+273
 #
-TEnvLow = 20 + 273
-TEnvHigh = 26 + 273
+TEnvLow = 26 + 273
+TEnvHigh = 30 + 273
 Metab = 58
 # watts/K/m2
 qBar = 58.2
@@ -50,11 +50,11 @@ FclToEnv = 0.72
 kAir = 0.024
 kClo = 0.047
 # m
-thickAir = 2*10**(-3)
+thickAir = 2.36*10**(-3)
 thickClo = 0.5*10**(-3)
 
 qRS = sigma * TBody ** 4
-qRE = sigma * TEnv ** 4
+# qRE = sigma * TEnv ** 4
 
 X,Y,Z = [],[],[]
 Epsilon = []
@@ -66,8 +66,10 @@ for TEnv in range(TEnvLow,TEnvHigh):
     epsilonCloList = []
     qRE = sigma * TEnv ** 4
 
-    for tauClo in np.linspace(0, 1, 101):
-        for rhoClo in np.linspace(0, 1, 101):
+    for tauClo in np.linspace(0, 1, 1):
+        tauClo = 0.03
+        for rhoClo in np.linspace(0, 1, 10):
+            # rhoClo = 0.3
             if (tauClo + rhoClo) > 1:
                 continue
             epsilonClo = 1 - tauClo - rhoClo
@@ -92,7 +94,7 @@ for TEnv in range(TEnvLow,TEnvHigh):
             qRCloTwo = sigma*TCloTwo**4
             qConvCE = Metab - tauClo*qRS+(epsilonClo-rhoClo)*qRE - qRCloTwo
             hConvCE = qConvCE/(TCloTwo - TEnv)
-            if(hConvCE <= 0 or hConvCE > 15 ):
+            if(hConvCE <= 3 or hConvCE > 30 ):
                 continue
             tauCloList.append(tauClo)
             rhoCloList.append(rhoClo)
@@ -110,9 +112,9 @@ for TEnv in range(TEnvLow,TEnvHigh):
 plots = zip(X,Y,Z)
 for idx,itm in enumerate(X):
     print(len(itm))
-print(X)
-print(Y)
-print(Epsilon)
+# print(X)
+# print(Y)
+# print(Epsilon)
 # print(Z)
 
 
@@ -123,7 +125,7 @@ def loop_plot(plots,len):
         ax=figs.add_subplot(1,len,idx+1, projection='3d')
         try:
             # ax.plot_trisurf(plot[0],plot[1],plot[2])
-            ax.scatter(plot[0], plot[1], plot[2])
+            ax.scatter(plot[0], plot[1], plot[2],marker="o")
         except RuntimeError:
             continue
         ax.set_title("Max TEnv: "+str(TEnvLow+1+idx)+"K")
@@ -131,7 +133,7 @@ def loop_plot(plots,len):
             ax.set_xlabel('tau')
             ax.set_ylabel('rho')
             ax.set_zlabel('hConv')
-            xyLabel =False
+            # xyLabel =False
     return figs
 figs = loop_plot(plots,len(X))
 # figs.savefig("TEnv from "+str(TEnvLow) +"K to "+str(TEnvHigh)+"K.png")
