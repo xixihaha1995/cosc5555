@@ -1,5 +1,12 @@
 import numpy as np
 import fqs
+import matplotlib.pyplot as plt
+import scipy
+import scipy.interpolate
+
+import matplotlib
+fig = plt.figure()
+ax = plt.axes(projection='3d')
 
 # # quartic solver
 
@@ -46,6 +53,9 @@ thickClo = 0.5*10**(-3)
 
 qRE = sigma*TEnv**4
 qRS = sigma*TBody**4
+tauCloList = []
+rhoCloList = []
+hConvCEList = []
 for tauClo in np.linspace(0, 1, 11):
     for rhoClo in np.linspace(0, 1, 11):
         if (tauClo + rhoClo) > 1:
@@ -57,13 +67,53 @@ for tauClo in np.linspace(0, 1, 11):
         D = -1*kAir/thickAir
         E = kAir/thickAir*(TBody)-tauClo*qRE + (epsilonClo - rhoClo) * qRS - Metab
         p = np.array([[A, B, C, D, E]])
-        TCloOneRoots = fqs.quartic_roots(p)
+        try:
+            TCloOneRoots = fqs.quartic_roots(p)
+        except ZeroDivisionError:
+            continue
         if (TCloOneRoots[0][1].real > 0):
             TCloOne = TCloOneRoots[0][1].real
         else:
             continue
         TCloTwo = TCloOne - Metab/kClo*thickClo
-        print("TCloOne:"+str(TCloOne)+", TCloTwo:"+ str(TCloTwo))
+        # print("TCloOne:"+str(TCloOne)+", TCloTwo:"+ str(TCloTwo))
+        qRCloTwo = sigma*TCloTwo**4
+        qConvCE = Metab - tauClo*qRS+(epsilonClo-rhoClo)*qRE - qRCloTwo
+        hConvCE = qConvCE/(TCloTwo - TEnv)
+        if(hConvCE <= 0):
+            continue
+        tauCloList.append(tauClo)
+        rhoCloList.append(rhoClo)
+        hConvCEList.append(hConvCE)
+
+
+xtau = np.array(tauCloList)
+yrho = np.array(rhoCloList)
+zhconv = np.array(hConvCEList)
+print(tauCloList)
+print(rhoCloList)
+print(hConvCEList)
+# points = np.append(xtau,yrho)
+# # X = [xtau]
+# # Y = [yrho]
+# # Z = [zhconv]
+# #
+# # # zhConv = np.array(hConvCEList)
+# #
+# # ax.plot_surface(X, Y, Z)
+# print(xtau.shape)
+#
+# xi = np.linspace(0, 1, num=xtau.shape[0])
+# yi = np.linspace(0, 1, num=xtau.shape)
+#
+# zi = scipy.interpolate.griddata(points, hConvCEList, (xi, yi),method='linear')
+# ax.plot_surface(xi, yi, zi)
+# ax.set_xlabel('tau')
+# ax.set_ylabel('rho')
+# ax.set_zlabel('hConv')
+# ax.set_title("Max TEnv: "+str(TEnv))
+# plt.show()
+
 
 
 
