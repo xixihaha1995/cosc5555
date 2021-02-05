@@ -89,7 +89,8 @@ for TEnv in range(TEnvLow,TEnvHigh):
                 TCloOne = TCloOneRoots[0][1].real
             else:
                 continue
-            TCloTwo = TCloOne - Metab/kClo*thickClo
+            # TCloTwo = TCloOne - Metab/kClo*thickClo
+            TCloTwo = TCloOne
             print("TCloOne:"+str(TCloOne)+", TCloTwo:"+ str(TCloTwo)+", TEnv:"+ str(TEnv))
             qRCloTwo = epsilonClo *sigma*TCloTwo**4
             qConvCE = Metab - tauClo*qRS+(epsilonClo-rhoClo)*qRE - qRCloTwo
