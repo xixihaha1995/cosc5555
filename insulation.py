@@ -6,8 +6,8 @@ import scipy
 import scipy.interpolate
 
 import matplotlib
-fig = plt.figure()
-ax = plt.axes(projection='3d')
+# fig = plt.figure()
+# ax = plt.axes(projection='3d')
 
 # # quartic solver
 
@@ -28,11 +28,11 @@ ax = plt.axes(projection='3d')
 TBody = 34 + 273
 # TEnv = 22+273
 #
-TEnvLow = 12 + 273
-TEnvHigh = 18 + 273
-Metab = 58
+TEnvLow = 25 + 273
+TEnvHigh = 28 + 273
 # watts/K/m2
-qBar = 28
+Metab = 58
+
 # sigma unit W*(m^-2)*(K^-4)
 sigma = 5.67*10**(-8)
 epsilonSkin = 1
@@ -40,10 +40,11 @@ epsilonEnv = 1
 FskToCl = 1
 FclToSk = 1
 
-AreaBody = 2
-AreaEnv = 10
-FEnvToCl = 0.28
-FclToEnv = 0.72
+# # the following has not been implemented
+# AreaBody = 2
+# AreaEnv = 10
+# FEnvToCl = 0.28
+# FclToEnv = 0.72
 
 # enclosed Air
 # W*(m^-2)*(K^-1)
@@ -66,9 +67,9 @@ for TEnv in range(TEnvLow,TEnvHigh):
     epsilonCloList = []
     qRE = sigma * TEnv ** 4
 
-    for tauClo in np.linspace(0, 1, 11):
+    for tauClo in np.linspace(0, 1, 101):
         # tauClo = 0.03
-        for rhoClo in np.linspace(0, 1, 11):
+        for rhoClo in np.linspace(0, 1, 101):
             # rhoClo = 0.001
             if (tauClo + rhoClo) > 1:
                 continue
@@ -95,7 +96,7 @@ for TEnv in range(TEnvLow,TEnvHigh):
             qRCloTwo = epsilonClo *sigma*TCloTwo**4
             qConvCE = Metab - tauClo*qRS+(epsilonClo-rhoClo)*qRE - qRCloTwo
             hConvCE = qConvCE/(TCloTwo - TEnv)
-            if(hConvCE <= 0 or hConvCE >50 ):
+            if(hConvCE <= 0 ):
                 continue
             tauCloList.append(tauClo)
             rhoCloList.append(rhoClo)
@@ -134,12 +135,14 @@ def loop_plot(plots,len):
             ax.set_xlabel('tau')
             ax.set_ylabel('rho')
             ax.set_zlabel('hConv')
+            # plt.xlim([0, 1])
+            # plt.ylim([0, 1])
             # xyLabel =False
     return figs
 figs = loop_plot(plots,len(X))
 # fig.suptitle('This is a somewhat long figure title', fontsize=16)
 
-figs.suptitle("Smart Clothing Adjusting Maps",fontsize=16)
+figs.suptitle("Smart Clothing Cooling Maps",fontsize=36)
 figs.savefig("TEnv from "+str(TEnvLow) +"K to "+str(TEnvHigh)+"K.png")
 plt.show()
 
