@@ -86,14 +86,14 @@ for TEnv in range(TEnvLow,TEnvHigh):
                 TCloOneRoots = fqs.quartic_roots(p)
             except ZeroDivisionError:
                 continue
-            # print(TCloOneRoots)
+            # print("TCloOne:" + str(TCloOneRoots[0][1].real)+", TEnv:" + str(TEnv))
             if (TCloOneRoots[0][1].real > 0 and TCloOneRoots[0][1].real > TEnv):
                 TCloOne = TCloOneRoots[0][1].real
             else:
                 continue
             # TCloTwo = TCloOne - Metab/kClo*thickClo
             TCloTwo = TCloOne
-            # print("TCloOne:"+str(TCloOne)+", TCloTwo:"+ str(TCloTwo)+", TEnv:"+ str(TEnv))
+            # print("TCloOne:"+str(TCloOne)+", TEnv:"+ str(TEnv))
             qRCloTwo = epsilonClo *sigma*TCloTwo**4
             qConvCE = Metab - tauClo*qRS+(epsilonClo-rhoClo)*qRE - qRCloTwo
             hConvCE = qConvCE/(TCloTwo - TEnv)
