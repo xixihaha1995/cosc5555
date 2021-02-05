@@ -28,8 +28,8 @@ import matplotlib
 TBody = 34 + 273
 # TEnv = 22+273
 #
-TEnvLow = 25 + 273
-TEnvHigh = 28 + 273
+TEnvLow = 22 + 273
+TEnvHigh = 30 + 273
 # watts/K/m2
 Metab = 58
 
@@ -68,9 +68,9 @@ for TEnv in range(TEnvLow,TEnvHigh):
     qRE = sigma * TEnv ** 4
 
     for tauClo in np.linspace(0, 1, 101):
-        # tauClo = 0.03
+        # tauClo = 0.7
         for rhoClo in np.linspace(0, 1, 101):
-            # rhoClo = 0.001
+            # rhoClo = 0.1
             if (tauClo + rhoClo) > 1:
                 continue
             epsilonClo = 1 - tauClo - rhoClo
@@ -86,6 +86,7 @@ for TEnv in range(TEnvLow,TEnvHigh):
                 TCloOneRoots = fqs.quartic_roots(p)
             except ZeroDivisionError:
                 continue
+            # print(TCloOneRoots)
             if (TCloOneRoots[0][1].real > 0 and TCloOneRoots[0][1].real > TEnv):
                 TCloOne = TCloOneRoots[0][1].real
             else:
@@ -96,7 +97,7 @@ for TEnv in range(TEnvLow,TEnvHigh):
             qRCloTwo = epsilonClo *sigma*TCloTwo**4
             qConvCE = Metab - tauClo*qRS+(epsilonClo-rhoClo)*qRE - qRCloTwo
             hConvCE = qConvCE/(TCloTwo - TEnv)
-            if(hConvCE <= 0 ):
+            if(hConvCE <= 0 or hConvCE >= 50 ):
                 continue
             tauCloList.append(tauClo)
             rhoCloList.append(rhoClo)
@@ -140,10 +141,10 @@ def loop_plot(plots,len):
             # xyLabel =False
     return figs
 figs = loop_plot(plots,len(X))
-# fig.suptitle('This is a somewhat long figure title', fontsize=16)
+
 
 figs.suptitle("Smart Clothing Cooling Maps",fontsize=36)
-figs.savefig("TEnv from "+str(TEnvLow) +"K to "+str(TEnvHigh)+"K.png")
+# figs.savefig("TEnv from "+str(TEnvLow) +"K to "+str(TEnvHigh)+"K.png")
 plt.show()
 
 
