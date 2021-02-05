@@ -28,8 +28,8 @@ ax = plt.axes(projection='3d')
 TBody = 34 + 273
 # TEnv = 22+273
 #
-TEnvLow = 22 + 273
-TEnvHigh = 30 + 273
+TEnvLow = 12 + 273
+TEnvHigh = 18 + 273
 Metab = 58
 # watts/K/m2
 qBar = 28
@@ -66,9 +66,9 @@ for TEnv in range(TEnvLow,TEnvHigh):
     epsilonCloList = []
     qRE = sigma * TEnv ** 4
 
-    for tauClo in np.linspace(0, 1, 101):
-        # tauClo = 0.99
-        for rhoClo in np.linspace(0, 1, 101):
+    for tauClo in np.linspace(0, 1, 11):
+        # tauClo = 0.03
+        for rhoClo in np.linspace(0, 1, 11):
             # rhoClo = 0.001
             if (tauClo + rhoClo) > 1:
                 continue
@@ -91,11 +91,11 @@ for TEnv in range(TEnvLow,TEnvHigh):
                 continue
             # TCloTwo = TCloOne - Metab/kClo*thickClo
             TCloTwo = TCloOne
-            print("TCloOne:"+str(TCloOne)+", TCloTwo:"+ str(TCloTwo)+", TEnv:"+ str(TEnv))
+            # print("TCloOne:"+str(TCloOne)+", TCloTwo:"+ str(TCloTwo)+", TEnv:"+ str(TEnv))
             qRCloTwo = epsilonClo *sigma*TCloTwo**4
             qConvCE = Metab - tauClo*qRS+(epsilonClo-rhoClo)*qRE - qRCloTwo
             hConvCE = qConvCE/(TCloTwo - TEnv)
-            if(hConvCE <= 0 or hConvCE >13 ):
+            if(hConvCE <= 0 or hConvCE >50 ):
                 continue
             tauCloList.append(tauClo)
             rhoCloList.append(rhoClo)
@@ -120,7 +120,7 @@ for idx,itm in enumerate(X):
 
 
 def loop_plot(plots,len):
-    figs = plt.figure(figsize=(20, 20))
+    figs = plt.figure(figsize=(30, 30))
     xyLabel = True
     for idx, plot in enumerate(plots):
         ax=figs.add_subplot(1,len,idx+1, projection='3d')
@@ -137,7 +137,10 @@ def loop_plot(plots,len):
             # xyLabel =False
     return figs
 figs = loop_plot(plots,len(X))
-# figs.savefig("TEnv from "+str(TEnvLow) +"K to "+str(TEnvHigh)+"K.png")
+# fig.suptitle('This is a somewhat long figure title', fontsize=16)
+
+figs.suptitle("Smart Clothing Adjusting Maps",fontsize=16)
+figs.savefig("TEnv from "+str(TEnvLow) +"K to "+str(TEnvHigh)+"K.png")
 plt.show()
 
 
