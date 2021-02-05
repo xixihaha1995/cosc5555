@@ -26,10 +26,19 @@ import matplotlib
 # constants
 # degree C
 TBody = 34 + 273
-# TEnv = 22+273
+# opereation = "heating"
+# opereation = "indoor cooling"
+opereation = "outdoor cooling"
 #
-TEnvLow = 22 + 273
-TEnvHigh = 30 + 273
+if (opereation == "heating"):
+    TEnvLow = 12 + 273
+    TEnvHigh = 20 + 273
+elif(opereation == "outdoor cooling"):
+    TEnvLow = 35 + 273
+    TEnvHigh = 40 + 273
+else:
+    TEnvLow = 25 + 273
+    TEnvHigh = 28 + 273
 # watts/K/m2
 Metab = 58
 
@@ -67,10 +76,10 @@ for TEnv in range(TEnvLow,TEnvHigh):
     epsilonCloList = []
     qRE = sigma * TEnv ** 4
 
-    for tauClo in np.linspace(0, 1, 101):
-        # tauClo = 0.7
-        for rhoClo in np.linspace(0, 1, 101):
-            # rhoClo = 0.1
+    for tauClo in np.linspace(0, 1, 11):
+        # tauClo = 0.03
+        for rhoClo in np.linspace(0, 1, 11):
+            # rhoClo = 0.3
             if (tauClo + rhoClo) > 1:
                 continue
             epsilonClo = 1 - tauClo - rhoClo
@@ -87,7 +96,7 @@ for TEnv in range(TEnvLow,TEnvHigh):
             except ZeroDivisionError:
                 continue
             # print("TCloOne:" + str(TCloOneRoots[0][1].real)+", TEnv:" + str(TEnv))
-            if (TCloOneRoots[0][1].real > 0 and TCloOneRoots[0][1].real > TEnv):
+            if (TCloOneRoots[0][1].real > 0 and TCloOneRoots[0][1].real < TEnv):
                 TCloOne = TCloOneRoots[0][1].real
             else:
                 continue
@@ -97,7 +106,7 @@ for TEnv in range(TEnvLow,TEnvHigh):
             qRCloTwo = epsilonClo *sigma*TCloTwo**4
             qConvCE = Metab - tauClo*qRS+(epsilonClo-rhoClo)*qRE - qRCloTwo
             hConvCE = qConvCE/(TCloTwo - TEnv)
-            if(hConvCE <= 0 or hConvCE >= 50 ):
+            if(hConvCE <= 0 or hConvCE > 50  ):
                 continue
             tauCloList.append(tauClo)
             rhoCloList.append(rhoClo)
@@ -113,8 +122,8 @@ for TEnv in range(TEnvLow,TEnvHigh):
     Z.append(zhconv)
     Epsilon.append(epcl)
 plots = zip(X,Y,Z)
-for idx,itm in enumerate(X):
-    print(len(itm))
+# for idx,itm in enumerate(X):
+#     print(len(itm))
 # print(X)
 # print(Y)
 # print(Epsilon)
@@ -136,15 +145,15 @@ def loop_plot(plots,len):
             ax.set_xlabel('tau')
             ax.set_ylabel('rho')
             ax.set_zlabel('hConv')
-            # plt.xlim([0, 1])
-            # plt.ylim([0, 1])
+            plt.xlim([0, 1])
+            plt.ylim([0, 1])
             # xyLabel =False
     return figs
 figs = loop_plot(plots,len(X))
 
 
-figs.suptitle("Smart Clothing Cooling Maps",fontsize=36)
-# figs.savefig("TEnv from "+str(TEnvLow) +"K to "+str(TEnvHigh)+"K.png")
+figs.suptitle("Smart Clothing "+opereation+" Maps",fontsize=36)
+figs.savefig(opereation+" from "+str(TEnvLow) +"K to "+str(TEnvHigh)+"K.png")
 plt.show()
 
 
