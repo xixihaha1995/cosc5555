@@ -27,8 +27,8 @@ import matplotlib
 # degree C
 TBody = 34 + 273
 # opereation = "heating"
-# opereation = "indoor cooling"
-opereation = "outdoor cooling"
+opereation = "indoor cooling"
+# opereation = "outdoor cooling"
 #
 if (opereation == "heating"):
     TEnvLow = 12 + 273
@@ -76,9 +76,9 @@ for TEnv in range(TEnvLow,TEnvHigh):
     epsilonCloList = []
     qRE = sigma * TEnv ** 4
 
-    for tauClo in np.linspace(0, 1, 11):
+    for tauClo in np.linspace(0, 1, 101):
         # tauClo = 0.03
-        for rhoClo in np.linspace(0, 1, 11):
+        for rhoClo in np.linspace(0, 1, 101):
             # rhoClo = 0.3
             if (tauClo + rhoClo) > 1:
                 continue
@@ -145,8 +145,8 @@ def loop_plot(plots,len):
             ax.set_xlabel('tau')
             ax.set_ylabel('rho')
             ax.set_zlabel('hConv')
-            plt.xlim([0, 1])
-            plt.ylim([0, 1])
+            # plt.xlim([0, 1])
+            # plt.ylim([0, 1])
             # xyLabel =False
     return figs
 figs = loop_plot(plots,len(X))
