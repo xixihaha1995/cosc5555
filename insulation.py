@@ -89,14 +89,16 @@ for TEnv in range(TEnvLow,TEnvHigh):
             B = 0
             C = 0
             D = -1*kAir/thickAir
-            E = kAir/thickAir*(TBody)-tauClo*qRE + (epsilonClo - rhoClo) * qRS - Metab
+            # E = kAir/thickAir*(TBody)-tauClo*qRE + (epsilonClo - rhoClo) * qRS - Metab
+            E = kAir / thickAir * (TBody) - tauClo * qRE + (
+                        1 - rhoClo) * qRS - Metab
             p = np.array([[A, B, C, D, E]])
             try:
                 TCloOneRoots = fqs.quartic_roots(p)
             except ZeroDivisionError:
                 continue
             # print("TCloOne:" + str(TCloOneRoots[0][1].real)+", TEnv:" + str(TEnv))
-            if (TCloOneRoots[0][1].real > 0 and TCloOneRoots[0][1].real < TEnv):
+            if (TCloOneRoots[0][1].real > 0 and TCloOneRoots[0][1].real > TEnv):
                 TCloOne = TCloOneRoots[0][1].real
             else:
                 continue
