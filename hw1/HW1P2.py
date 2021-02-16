@@ -10,6 +10,7 @@ dataArr = np.array(data)
 # data[ny,nx]
 x = dataArr[:,0]
 y = dataArr[:,3]
+print(type(y))
 
 dummColumn = np.ones((100,))
 H = np.column_stack((dummColumn,x))
@@ -22,3 +23,9 @@ yTwo = np.matmul(weightA,[1,2])
 yThree = np.matmul(weightA,[1,3])
 # print("weightA:%s, yone:%s, ytwo:%s, ythree:%s"%(weightA,yOne,yTwo,yThree))
 # weightA:[ 5.92794892 -2.03833663], yone:3.8896122844108025, ytwo:1.851275650759999, ythree:-0.18706098289080408
+
+for i in range(5):
+    HSlice = H[20*i:20*(i+1),:]
+    # ySlice = y[20*i:20*(i+1)]
+    # yCap = np.matmul(weightA,HSlice)
+    # print(yCap)
