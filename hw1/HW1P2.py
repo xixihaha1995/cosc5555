@@ -24,8 +24,12 @@ yThree = np.matmul(weightA,[1,3])
 # print("weightA:%s, yone:%s, ytwo:%s, ythree:%s"%(weightA,yOne,yTwo,yThree))
 # weightA:[ 5.92794892 -2.03833663], yone:3.8896122844108025, ytwo:1.851275650759999, ythree:-0.18706098289080408
 
+#CV for 5 fold
+geneError = []
 for i in range(5):
     HSlice = H[20*i:20*(i+1),:]
-    # ySlice = y[20*i:20*(i+1)]
-    # yCap = np.matmul(weightA,HSlice)
-    # print(yCap)
+    ySlice = y[20*i:20*(i+1)]
+    yCap = [np.matmul(weightA,item) for item in HSlice]
+    geneError.append(np.sum((yCap - ySlice )**2))
+generationErrorA = np.sum(geneError) /5
+# print(generationErrorA)
