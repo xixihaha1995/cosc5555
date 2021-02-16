@@ -69,5 +69,25 @@ validYCap = np.array(validYPoly,dtype=list)
 #  [4.250618769472329 3.219030004977256 0.17643607617099732]
 #  [4.254719440378921 3.2135661153484136 0.1805367470836643]
 #  [4.256502600356072 3.2135661153679393 0.1787535871174839]]
+# partC up
+
+
+cvGeneErr = [generationErrorA]
+for idx, poly in enumerate(polynomial):
+    tempErr = []
+    HPoly = []
+    for p in range(poly + 1):
+        HPoly.append(x ** p)
+    HPolyNd = np.array(HPoly)
+    for i in range(5):
+        HSlice = HPolyNd[20 * i:20 * (i + 1), :]
+        ySlice = y[20 * i:20 * (i + 1)]
+        print(weight[idx+1])
+        print(len(HSlice))
+        yCap = [np.matmul(weight[idx+1], item) for item in HSlice]
+        tempErr.append(np.sum((yCap - ySlice) ** 2))
+    generationError = np.sum(tempErr) / 5
+    cvGeneErr.append(generationError)
+print(cvGeneErr)
 
 
