@@ -31,9 +31,6 @@ def coorLassoSolver(converg, lamd,Y, hX,*passweight):
 
             hJ = inputX[:,j].reshape(-1,1)
             yPred = inputX @ weight
-            # print(hJ.shape)
-            # brac = weight[j]*hJ[j] + responY - yPred
-            # rho = np.sum(hJ *brac)
             rho = np.dot(hJ.T, (responY-yPred+weight[j]*hJ))
             weightNext[j] = softThreshold(rho,lamd)
         diff = np.abs(weight-weightNext)
