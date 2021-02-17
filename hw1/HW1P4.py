@@ -15,44 +15,60 @@ def softThreshold(rho,lamd):
         return rho - lamd/2
     return 0
 
-def coorLassoSolver(converg, lamd,Y, hX,*passweight):
+def coorLassoSolver(converg, lamd,Y, inputX,*passweight):
     l1norm = 10
-    m,n = hX.shape
-    inputX = hX/(np.linalg.norm(hX, axis= 0))
-    # xTrain.assign(Name="weight0")
-    # xTrain["weight0"] = [1] * row
+    m,n = inputX.shape
+
     # weight = np.array([i for i in passweight])
     responY = Y.reshape(-1,1)
     weight = np.asarray(passweight).T
-    weightNext = copy.deepcopy(weight)
+    prevWei = copy.deepcopy(weight)
     while l1norm > converg:
         for j in range(n):
             # print(inputX.shape)
 
             hJ = inputX[:,j].reshape(-1,1)
             yPred = inputX @ weight
-            rho = np.dot(hJ.T, (responY-yPred+weight[j]*hJ))
-            weightNext[j] = softThreshold(rho,lamd)
-        diff = np.abs(weight-weightNext)
+            # rho = X_j.T @ (y - y_pred + theta[j] * X_j)
+            rho = hJ.T @(responY - yPred+weight[j]*hJ)
+            # rho = np.dot( hJ.T,(responY-yPred+weight[j]*hJ))
+            weight[j] = softThreshold(rho,lamd)
+        diff = np.abs(weight-prevWei)
         l1norm =max(diff)
-        weight = copy.deepcopy(weightNext)
-        print(l1norm)
+        prevWei=copy.deepcopy(weight)
+        # print(l1norm)
     return weight.flatten()
 
 
 xTrain = df_train.drop("ViolentCrimesPerPop",axis = 1)
 
+xTrain = xTrain / (np.linalg.norm(xTrain.values, axis=0))
+xTrain.assign(Name="weight0")
+xTrain["weight0"] = [1] * row
+
+
 # print(xTrain.head())
 yTrain = df_train.iloc[:,0]
 # print(yTrain.head())
 # for different lambda, different weights
-weightInit = np.random.uniform(low=0,high = 1, size=col-1)
-print(type(weightInit))
+weightGus = np.random.uniform(low=0,high = 1, size=col-1)
+# print(weightGus.shape)
 lamd = 600
+weightPro = coorLassoSolver(1e-6,lamd,yTrain.values,xTrain.values,weightGus)
+# print(weightPro.shape)
+weightNow = copy.deepcopy(weightPro)
 # print(xTrain.shape)
 
-weightPro = coorLassoSolver(1e-6,lamd,yTrain.values,xTrain.values,weightInit)
-# print(max(weightPro))
+weightAll=[weightNow]
+for i in range(9):
+    lamd = lamd/2
+    print("conver:%s, lambda:%s" % (i,lamd))
+    weightNext = coorLassoSolver(1e-6,lamd,yTrain.values,xTrain.values,weightNow)
+    weightAll.append(weightNext)
+    # print("conver:%s"% (i))
+    weightNow = copy.deepcopy(weightNext)
+
+print(weightAll)
 
 
 
