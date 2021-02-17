@@ -18,19 +18,18 @@ def coorLassoSolver(converg, lamd, responY, hX,weight):
     l1norm = 10
     m,n = hX.shape
     inputX = hX/(np.linalg.norm(hX, axis= 0))
-    yPred = weight @ inputX
+    yPred =inputX  @ weight
     while l1norm > converg:
-        l1norm = 0
+        weightNext = weight[:]
         for j in range(n):
-            print(inputX.shape)
+            # print(inputX.shape)
             hJ = inputX[:,j].reshape(-1,1)
-            print(hJ.shape)
-            rho = hJ @ (responY - yPred + weight[j]*hJ)
-            oldWeight = weight[j]
-            weight[j] = softThreshold(rho,lamd)
-            newWeight  = weight[j]
-            if np.abs(oldWeight, newWeight) > l1norm:
-                l1norm = np.abs(oldWeight, newWeight)
+            # print(hJ.shape)
+            rho = np.sum(hJ *(responY - yPred + weight[j]*hJ[j]))
+            weightNext[j] = softThreshold(rho,lamd)
+        diff = np.abs(weight-weightNext)
+        l1norm =max(diff)
+        print(l1norm)
     return weight.flatten()
 
 
@@ -41,12 +40,12 @@ xTrain["weight0"] =[1]*row
 yTrain = df_train.iloc[:,0]
 # print(yTrain.head())
 # for different lambda, different weights
-weightInit = np.random.uniform(size=row)
+weightInit = np.random.uniform(low=0,high = 1, size=col)
 # print(weightInit.shape)
 lamd = 600
-print(xTrain.shape)
+# print(xTrain.shape)
 weight = coorLassoSolver(1e-6,lamd,yTrain.values,xTrain.values,weightInit)
-
+print(weight)
 
 
 
