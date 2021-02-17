@@ -3,7 +3,7 @@ import numpy as np
 import copy
 df_train = pd.read_table("crime-train.txt")
 df_test = pd.read_table("crime-test.txt")
-row,col = df_train.shape
+
 # print(type(row))
 # print(row)
 # print(df_train.iloc[:,0])
@@ -26,7 +26,6 @@ def coorLassoSolver(converg, lamd,Y, inputX,*passweight):
     while l1norm > converg:
         for j in range(n):
             # print(inputX.shape)
-
             hJ = inputX[:,j].reshape(-1,1)
             yPred = inputX @ weight
             # rho = X_j.T @ (y - y_pred + theta[j] * X_j)
@@ -41,11 +40,15 @@ def coorLassoSolver(converg, lamd,Y, inputX,*passweight):
 
 
 xTrain = df_train.drop("ViolentCrimesPerPop",axis = 1)
-print(xTrain.head())
-xTrain = xTrain / (np.linalg.norm(xTrain.values, axis=0))
+# print(xTrain.head())
 xTrain.assign(Name="weight0")
+row,col = xTrain.shape
 xTrain["weight0"] = [1] * row
-print(xTrain.head())
+xTrain = xTrain / (np.linalg.norm(xTrain.values, axis=0))
+# print(np.linalg.norm(xTrain.values, axis=0))
+
+row,col = xTrain.shape
+# print(xTrain.head())
 
 
 # print(xTrain.head())
