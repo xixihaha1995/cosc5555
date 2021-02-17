@@ -22,8 +22,8 @@ def coorLassoSolver(converg, lamd, responY, hX,*passweight):
     # weight = np.array([i for i in passweight])
     weight = np.asarray(passweight).T
     yPred =inputX  @ weight
+    weightNext = copy.deepcopy(weight)
     while l1norm > converg:
-        weightNext =np.ones((n,1))
         for j in range(n):
             # print(inputX.shape)
             hJ = inputX[:,j].reshape(-1,1)
@@ -32,6 +32,7 @@ def coorLassoSolver(converg, lamd, responY, hX,*passweight):
             weightNext[j] = softThreshold(rho,lamd)
         diff = np.abs(weight-weightNext)
         l1norm =max(diff)
+        weight = copy.deepcopy(weightNext)
         print(l1norm)
     return weight.flatten()
 
