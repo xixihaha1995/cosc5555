@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import copy
 df_train = pd.read_table("crime-train.txt")
 df_test = pd.read_table("crime-test.txt")
 row,col = df_train.shape
@@ -14,13 +15,15 @@ def softThreshold(rho,lamd):
         return rho - lamd/2
     return 0
 
-def coorLassoSolver(converg, lamd, responY, hX,weight):
+def coorLassoSolver(converg, lamd, responY, hX,*passweight):
     l1norm = 10
     m,n = hX.shape
     inputX = hX/(np.linalg.norm(hX, axis= 0))
+    # weight = np.array([i for i in passweight])
+    weight = np.asarray(passweight).T
     yPred =inputX  @ weight
     while l1norm > converg:
-        weightNext = weight[:]
+        weightNext =np.ones((n,1))
         for j in range(n):
             # print(inputX.shape)
             hJ = inputX[:,j].reshape(-1,1)
@@ -41,11 +44,12 @@ yTrain = df_train.iloc[:,0]
 # print(yTrain.head())
 # for different lambda, different weights
 weightInit = np.random.uniform(low=0,high = 1, size=col)
-# print(weightInit.shape)
+print(type(weightInit))
 lamd = 600
 # print(xTrain.shape)
-weight = coorLassoSolver(1e-6,lamd,yTrain.values,xTrain.values,weightInit)
-print(weight)
+
+weightPro = coorLassoSolver(1e-6,lamd,yTrain.values,xTrain.values,weightInit)
+# print(max(weightPro))
 
 
 
