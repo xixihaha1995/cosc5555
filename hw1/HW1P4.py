@@ -41,17 +41,18 @@ def coorLassoSolver(converg, lamd,Y, inputX,*passweight):
 
 
 xTrain = df_train.drop("ViolentCrimesPerPop",axis = 1)
-
+print(xTrain.head())
 xTrain = xTrain / (np.linalg.norm(xTrain.values, axis=0))
 xTrain.assign(Name="weight0")
 xTrain["weight0"] = [1] * row
+print(xTrain.head())
 
 
 # print(xTrain.head())
 yTrain = df_train.iloc[:,0]
 # print(yTrain.head())
 # for different lambda, different weights
-weightGus = np.random.uniform(low=0,high = 1, size=col-1)
+weightGus = np.random.uniform(low=0,high = 1, size=col)
 # print(weightGus.shape)
 lamd = 600
 weightPro = coorLassoSolver(1e-6,lamd,yTrain.values,xTrain.values,weightGus)
