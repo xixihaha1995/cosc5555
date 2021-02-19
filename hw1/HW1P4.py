@@ -42,25 +42,32 @@ def coorLassoSolver(converg, lamd,Y, inputX,*passweight):
 
 
 xTrain = df_train.drop("ViolentCrimesPerPop",axis = 1)
+xTest = df_test.drop("ViolentCrimesPerPop",axis = 1)
 # print(xTrain.head())
 xTrain.assign(Name="weight0")
-row,col = xTrain.shape
-xTrain["weight0"] = [1] * row
+xTest.assign(Name="weight0")
+rowTrain,colTrain = xTrain.shape
+rowTest,colTest = xTest.shape
+xTrain["weight0"] = [1] * rowTrain
+xTest["weight0"] = [1] * rowTest
 column = xTrain.columns
 
 
 xTrain = xTrain / (np.linalg.norm(xTrain.values, axis=0))
+xTest = xTest / (np.linalg.norm(xTest.values, axis=0))
 # print(np.linalg.norm(xTrain.values, axis=0))
 
-row,col = xTrain.shape
+rowTrain,colTrain = xTrain.shape
+rowTest,colTest = xTest.shape
 # print(xTrain.head())
 
 
 # print(xTrain.head())
 yTrain = df_train.iloc[:,0]
+yTest = df_test.iloc[:,0]
 # print(yTrain.head())
 # for different lambda, different weights
-weightGus = np.random.uniform(low=0,high = 1, size=col)
+weightGus = np.random.uniform(low=0,high = 1, size=colTrain)
 # print(weightGus.shape)
 lamd = 600
 weightPro = coorLassoSolver(1e-6,lamd,yTrain.values,xTrain.values,weightGus)
@@ -91,17 +98,26 @@ for i in range(9):
 # idx:66, name:HousVacant
 
 pltX = [math.log(i) for i in lamdAll]
+pltPureX = [i for i in lamdAll]
 age = []
 pctW = []
 pctK = []
 pctI = []
 hous = []
+
+seTrain = []
+seTest = []
+nonZero = []
 for idx, weight in enumerate(weightAll):
     age.append(weight[3])
     pctW.append(weight[12])
     pctK.append(weight[39])
     pctI.append(weight[45])
     hous.append(weight[66])
+
+    seTrain.append(np.sum((yTrain - xTrain @ weight)**2) / rowTrain)
+    seTest.append(np.sum((yTest - xTest @ weight) ** 2) / rowTest)
+    nonZero.append(np.count_nonzero(weight))
 
 # print(pltX)
 # print(age)
@@ -119,15 +135,23 @@ ax.plot(pltX, hous,label='HousVacant')
 ax.set_xlabel('log(lambda)')
 ax.set_ylabel('coefficients')
 legend = ax.legend(fontsize='x-large')
+fig.savefig("hw1.4.2.png")
 
-# fig.savefig("hw14.2.png")
 
-seTrain = []
-seTest = []
-for idx, weight in enumerate:
-    seTrain.append(np.sum((yTrain - xTrain @ weight)**2))
+fig2, ax2 = plt.subplots()
+ax2.plot(pltX, seTrain, label='squared error train')
+ax2.plot(pltX, seTest, label='squared error test')
+ax2.set_xlabel('log(lambda)')
+ax2.set_ylabel('coefficients')
+legend2 = ax2.legend(fontsize='x-large')
+fig2.savefig("hw1.4.34.png")
 
-print(seTrain)
+
+fig3, ax3 = plt.subplots()
+ax3.plot(pltPureX, nonZero,label='nonZero')
+legend3 = ax3.legend(fontsize='x-large')
+fig3.savefig("hw1.4.5.png")
+
 
 plt.show()
 
