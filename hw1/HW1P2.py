@@ -8,12 +8,13 @@ with open('LR.csv', 'r') as csvfile:
     for line in lines:
         data.append([float(i) for i in line])
 dataArr = np.array(data)
+row, col = dataArr.shape
 # data[ny,nx]
 x = dataArr[:, 0]
 y = dataArr[:, 3]
 # print(type(y))
 
-dummColumn = np.ones((100,))
+dummColumn = np.ones((row,))
 H = np.column_stack((dummColumn, x))
 
 weightA = np.matmul(inv(np.matmul(np.transpose(H), H)), np.matmul(np.transpose(H), y))
@@ -24,16 +25,29 @@ yThree = np.matmul(weightA, [1, 3])
 # weightA:[ 5.92794892 -2.03833663], yone:3.8896122844108025, ytwo:1.851275650759999, ythree:-0.18706098289080408
 # partA up
 
-# CV for 5 fold
-geneError = []
-for i in range(5):
-    HSlice = H[20 * i:20 * (i + 1), :]
-    ySlice = y[20 * i:20 * (i + 1)]
-    yCap = [np.matmul(weightA, item) for item in HSlice]
-    geneError.append(np.sum((yCap - ySlice) ** 2))
-generationErrorA = np.sum(geneError) / 5
-# print(generationErrorA) 39.39972330162378
-# partB up
+def crossValidation(num_folds,H,y):
+    X_train_folds = np.array_split(H, num_folds)
+    y_train_folds = np.array_split(y, num_folds)
+
+    geneError = []
+    for i in range(num_folds):
+        X_train_cv = np.vstack(X_train_folds[0:i] + X_train_folds[i + 1:])
+        y_train_cv = np.hstack(y_train_folds[0:i] + y_train_folds[i + 1:])
+        X_valid_cv = X_train_folds[i]
+        y_valid_cv = y_train_folds[i]
+
+        obs= y_valid_cv.shape
+
+        weightA = np.matmul(inv(np.matmul(np.transpose(X_train_cv), X_train_cv)), np.matmul(np.transpose(X_train_cv), y_train_cv))
+        yCap = [np.matmul(weightA, item) for item in X_valid_cv]
+        geneError.append(np.sum((yCap - y_valid_cv) ** 2))
+    generationErrorA = np.sum(geneError) / num_folds/obs
+    return generationErrorA
+
+generationErrorA = crossValidation(5,H,y)
+# print(generationErrorA)
+# [5.76469978]
+# # partB up
 
 
 weight = [weightA]
