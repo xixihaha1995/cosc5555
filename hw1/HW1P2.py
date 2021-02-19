@@ -94,15 +94,10 @@ for idx, poly in enumerate(polynomial):
         HPoly = np.column_stack((HPoly, x ** p))
     HPolyNd = np.array(HPoly)
     # print(HPolyNd.shape)
-    for i in range(5):
-        HSlice = HPolyNd[20 * i:20 * (i + 1), :]
-        ySlice = y[20 * i:20 * (i + 1)]
-        # print(weight[idx+1])
-        yCap = [np.matmul(weight[idx+1], item) for item in HSlice]
-        tempErr.append(np.sum((yCap - ySlice) ** 2))
-    generationError = np.sum(tempErr) / 5
-    cvGeneErr.append(generationError)
+    err = crossValidation(5,HPolyNd,y)
+    cvGeneErr.append(err)
 # print(cvGeneErr)
-# [39.39972330162378, 9.476672230736952, 9.476649284085338, 9.476177987732848, 9.475605485228275]
+# [array([5.76469978]), array([0.50248819]), array([0.60056455]), array([1.11586524]), array([3.95550679])]
+# partD up
 
 
