@@ -119,6 +119,14 @@ for idx, weight in enumerate(weightAll):
     seTest.append(np.sum((yTest - xTest @ weight) ** 2) / rowTest)
     nonZero.append(np.count_nonzero(weight))
 
+optimLamd = seTest.index(min(seTest))
+maxFea =np.argmax(weightAll[optimLamd])
+minFea =np.argmin(weightAll[optimLamd])
+print("best lambda:%s; maxFea:%s, value:%s; minFea:%s, value:%s" %(lamdAll[optimLamd],column[maxFea],weightAll[optimLamd][maxFea], column[minFea],weightAll[optimLamd][minFea]))
+# row,col = np.unravel_index(np.argsort(weightAll[optimLamd].ravel()),weightAll[optimLamd].shape)
+print("2maxFea:%s, value:%s" %(column[45],weightAll[optimLamd][45]))
+
+
 # print(pltX)
 # print(age)
 # print(pctW)
