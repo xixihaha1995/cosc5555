@@ -73,7 +73,7 @@ def split_into_train_and_test(x_all_LF, frac_test=0.5, random_state=None):
     N = math.ceil(frac_test*exam)
 
     # np.random.RandomState(random_state)
-    temp = np.random.permutation(x_all_LF)
+    temp = random_state.permutation(x_all_LF)
     x_test_NF = temp[0:N,:]
     x_train_MF = temp[N:,:]
     return x_train_MF, x_test_NF
