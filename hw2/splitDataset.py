@@ -1,12 +1,13 @@
 '''
 hw2.py
-Author: TODO
+Author: Lichen Wu
 University of Wyoming COSC 4555/5555 Machine Learning, Spring 2021
 -------
 
 '''
 
 import numpy as np
+import math
 
 
 def split_into_train_and_test(x_all_LF, frac_test=0.5, random_state=None):
@@ -68,4 +69,33 @@ def split_into_train_and_test(x_all_LF, frac_test=0.5, random_state=None):
     if random_state is None:
         random_state = np.random
     # TODO fixme
-    return None, None
+    exam,fea = x_all_LF.shape
+    N = math.ceil(frac_test*exam)
+
+    # np.random.RandomState(random_state)
+    temp = np.random.permutation(x_all_LF)
+    x_test_NF = temp[0:N,:]
+    x_train_MF = temp[N:,:]
+    return x_train_MF, x_test_NF
+
+x_LF = np.eye(10)
+xcopy_LF = x_LF.copy() # preserve what input was before the call
+train_MF, test_NF = split_into_train_and_test(x_LF, frac_test=0.201, random_state=np.random.RandomState(0))
+print(train_MF.shape)
+# (7, 10)
+print(test_NF.shape)
+# (3, 10)
+print(train_MF)
+# [[0. 0. 1. 0. 0. 0. 0. 0. 0. 0.]
+#  [0. 0. 0. 0. 0. 0. 0. 0. 1. 0.]
+#  [0. 0. 0. 0. 1. 0. 0. 0. 0. 0.]
+#  [0. 0. 0. 0. 0. 0. 0. 0. 0. 1.]
+#  [0. 1. 0. 0. 0. 0. 0. 0. 0. 0.]
+#  [0. 0. 0. 0. 0. 0. 1. 0. 0. 0.]
+#  [0. 0. 0. 0. 0. 0. 0. 1. 0. 0.]]
+print(test_NF)
+# [[0. 0. 0. 1. 0. 0. 0. 0. 0. 0.]
+#  [1. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+#  [0. 0. 0. 0. 0. 1. 0. 0. 0. 0.]]
+## Verify that input array did not change due to function call
+print(np.allclose(x_LF, xcopy_LF))
