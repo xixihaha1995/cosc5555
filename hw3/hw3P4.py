@@ -32,6 +32,8 @@ yTest = test_NF[:,-1]
 xTrain = train_MF[:,:-1]
 yTrain = train_MF[:,-1]
 
+print(xTrain)
+print(yTrain)
 # print(xTrain.shape)
 # print(yTrain.shape)
 # print(xTest.shape)
