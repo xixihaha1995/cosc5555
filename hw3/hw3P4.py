@@ -54,6 +54,25 @@ def sgdLinear(epoch,stepSize,fakeOnlineTrainX,fakeOnlineTrainY):
 
     return weight
 
-trainedWeight = sgdLinear(100,0.8,xTrain,yTrain)
-print(trainedWeight)
+def sgaLogistic(epoch,stepSize,fakeOnlineTrainX,fakeOnlineTrainY):
+    row,col = fakeOnlineTrainX.shape
+    dummColumn = np.ones((row,))
+    HBatch = np.column_stack((dummColumn, fakeOnlineTrainX))
+    weight = [0 for i in range(col+1)]
+    for t in range(epoch):
+        obser = np.random.randint(row)
+        sample =  HBatch[obser]
+        Ind = fakeOnlineTrainY[obser]
+        P =1/(1+np.exp(-1*(weight@sample)))
+        for j in range(col+1):
+            hjFeature = sample[j]
+            derivative = hjFeature*(Ind - P)
+            weight = weight +  stepSize*derivative
+
+    return weight
+
+trainedWeightLinear = sgdLinear(100,0.8,xTrain,yTrain)
+trainedWeightLogistic = sgaLogistic(100,0.8,xTrain,yTrain)
+print(trainedWeightLinear)
+print(trainedWeightLogistic)
 
