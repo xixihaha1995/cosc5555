@@ -34,15 +34,21 @@ def Logistic(epsilon,stepSize,fakeOnlineTrainX,fakeOnlineTrainY):
     weight = np.array([0 for i in range(col+1)])
     partial = [10 for i in range(col+1)]
     breakWhile = 100
-    while(breakWhile > epsilon):
+    # while(breakWhile > epsilon):
+    for t in range(epsilon):
         for j in range(col+1):
             partial[j] = 0
             for i in range(row):
+                # print(weight@HBatch[i])
+                # print(HBatch[i])
+                # return
                 P = 1 / (1 + np.exp(-1 * (weight.T @HBatch[i])))
                 hjFeature = HBatch[i,j]
                 partial[j] += hjFeature*(yBatch[i] - P)
             weight[j] = weight[j] + stepSize*partial[j]
+        print(weight)
         breakWhile = abs(np.max(partial))
+        # print(breakWhile)
     return weight
-weight = Logistic(1e-2,1e-3,x,y)
+weight = Logistic(100,1e-4,x,y)
 
