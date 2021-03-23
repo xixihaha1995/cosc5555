@@ -91,6 +91,7 @@ def sgaLogistic(epoch,stepSize,fakeOnlineTrainX,fakeOnlineTrainY,xTest,yTest):
     dummColumn = np.ones((row,))
     HBatch = np.column_stack((dummColumn, fakeOnlineTrainX))
     weight = np.array([0 for i in range(col+1)])
+    AlltimeWeight = []
     # print(weight.shape)
     sumLoss = 0
     aveLoss = []
@@ -109,6 +110,7 @@ def sgaLogistic(epoch,stepSize,fakeOnlineTrainX,fakeOnlineTrainY,xTest,yTest):
         if t > 0 and (t%100 == 0):
             aveLoss.append(sumLoss /t)
             SSEArr.append(predictTest(xTest,weight,yTest))
+            AlltimeWeight.append(weight)
         # update weights
         for j in range(col+1):
             hjFeature = sample[j]
@@ -118,7 +120,7 @@ def sgaLogistic(epoch,stepSize,fakeOnlineTrainX,fakeOnlineTrainY,xTest,yTest):
         thisL2Weights = np.sqrt(np.sum(weight**2))
         l2Weights.append(thisL2Weights)
 
-    return weight,aveLoss,l2Weights,SSEArr
+    return AlltimeWeight,aveLoss,l2Weights,SSEArr
 # for stepSize in [0.8,1e-3,1-6]:
 #     trainedWeightLinear,aveLossLinear, l2WeightsLinear,SSEArrLinear = sgdLinear(100000,0.8,xTrain,yTrain,xTest,yTest)
 #
@@ -135,25 +137,33 @@ def sgaLogistic(epoch,stepSize,fakeOnlineTrainX,fakeOnlineTrainY,xTest,yTest):
 
 # WeightLogisticArr , aveLossLogisticArr, l2WeightsLogisticArr, SSEArrLogisticArr = [],[],[],[]
 
-# fig = plt.figure()
-# ax1 = fig.add_subplot(131)
-# ax2 = fig.add_subplot(132)
-# ax3 = fig.add_subplot(133)
-#
-# for stepSize in [0.8,1e-3,1e-5]:
-#     WeightLogistic, aveLossLogistic, l2WeightsLogistic, SSEArrLogistic = sgaLogistic(100000,stepSize,xTrain,yTrain,xTest,yTest)
-#
-#     ax1.plot(aveLossLogistic,label = "eta= "+str(stepSize))
-#     ax2.plot(l2WeightsLogistic,label = "eta= "+str(stepSize))
-#     ax3.plot(SSEArrLogistic,label = "eta= "+str(stepSize))
-#
-#     ax1.set_ylabel("aveLossLogistic")
-#     ax2.set_ylabel("l2WeightsLogistic")
-#     ax3.set_ylabel("SSEArrLogistic")
-#     legend1 = ax1.legend(fontsize='x-large')
-#     legend2 = ax2.legend(fontsize='x-large')
-#     legend3 = ax3.legend(fontsize='x-large')
-#
-# plt.show()
+fig = plt.figure()
+ax1 = fig.add_subplot(131)
+ax2 = fig.add_subplot(132)
+ax3 = fig.add_subplot(133)
+
+bestModel = [[],0]
+minTestSSE = 1e10
+for stepSize in [0.8,1e-3,1e-5]:
+    AlltimeWeightLogistic, aveLossLogistic, l2WeightsLogistic, SSEArrLogistic = sgaLogistic(100000,stepSize,xTrain,yTrain,xTest,yTest)
+
+    if np.min(SSEArrLogistic) < minTestSSE:
+        minTestSSE = np.min(SSEArrLogistic)
+        timp100 = np.argmin(SSEArrLogistic)
+        bestModel[0] =  AlltimeWeightLogistic[timp100]
+        bestModel[1] = stepSize
+
+    ax1.plot(aveLossLogistic,label = "eta= "+str(stepSize))
+    ax2.plot(l2WeightsLogistic,label = "eta= "+str(stepSize))
+    ax3.plot(SSEArrLogistic,label = "eta= "+str(stepSize))
+
+    ax1.set_ylabel("aveLossLogistic")
+    ax2.set_ylabel("l2WeightsLogistic")
+    ax3.set_ylabel("SSEArrLogistic")
+    legend1 = ax1.legend(fontsize='x-large')
+    legend2 = ax2.legend(fontsize='x-large')
+    legend3 = ax3.legend(fontsize='x-large')
+
+plt.show()
 
 
