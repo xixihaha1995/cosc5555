@@ -29,7 +29,7 @@ train_MF, test_NF = split_into_train_and_test(df, frac_test=268/768, random_stat
 # xTrain = df.drop("HasDiabetes",axis = 1)
 xTest = test_NF[:,:-1]
 yTest = test_NF[:,-1]
-
+# print(np.count_nonzero(yTest))
 xTrain = train_MF[:,:-1]
 yTrain = train_MF[:,-1]
 
@@ -133,27 +133,27 @@ def sgaLogistic(epoch,stepSize,fakeOnlineTrainX,fakeOnlineTrainY,xTest,yTest):
 # ax3.set_ylabel("SSEArrLinear")
 # plt.show()
 
-WeightLogisticArr , aveLossLogisticArr, l2WeightsLogisticArr, SSEArrLogisticArr = [],[],[],[]
-fig = plt.figure()
-ax1 = fig.add_subplot(131)
-ax2 = fig.add_subplot(132)
-ax3 = fig.add_subplot(133)
+# WeightLogisticArr , aveLossLogisticArr, l2WeightsLogisticArr, SSEArrLogisticArr = [],[],[],[]
 
-for stepSize in [0.8,1e-3,1-6]:
-    WeightLogistic, aveLossLogistic, l2WeightsLogistic, SSEArrLogistic = sgaLogistic(100000,stepSize,xTrain,yTrain,xTest,yTest)
-    ax1.plot(aveLossLogistic,label = "eta= "+str(stepSize))
-    ax1.set_ylabel("aveLossLogistic")
-    ax2.plot(l2WeightsLogistic,label = "eta= "+str(stepSize))
-    ax2.set_ylabel("l2WeightsLogistic")
-    ax3.plot(SSEArrLogistic,label = "eta= "+str(stepSize))
-    ax3.set_ylabel("SSEArrLogistic")
+# fig = plt.figure()
+# ax1 = fig.add_subplot(131)
+# ax2 = fig.add_subplot(132)
+# ax3 = fig.add_subplot(133)
+#
+# for stepSize in [0.8,1e-3,1e-5]:
+#     WeightLogistic, aveLossLogistic, l2WeightsLogistic, SSEArrLogistic = sgaLogistic(100000,stepSize,xTrain,yTrain,xTest,yTest)
+#
+#     ax1.plot(aveLossLogistic,label = "eta= "+str(stepSize))
+#     ax2.plot(l2WeightsLogistic,label = "eta= "+str(stepSize))
+#     ax3.plot(SSEArrLogistic,label = "eta= "+str(stepSize))
+#
+#     ax1.set_ylabel("aveLossLogistic")
+#     ax2.set_ylabel("l2WeightsLogistic")
+#     ax3.set_ylabel("SSEArrLogistic")
+#     legend1 = ax1.legend(fontsize='x-large')
+#     legend2 = ax2.legend(fontsize='x-large')
+#     legend3 = ax3.legend(fontsize='x-large')
+#
+# plt.show()
 
-    WeightLogisticArr.append(WeightLogistic)
-    aveLossLogisticArr.append(aveLossLogistic)
-    l2WeightsLogisticArr.append(l2WeightsLogistic)
-    SSEArrLogisticArr.append(SSEArrLogistic)
-plt.show()
-
-# print(trainedWeightLinear)
-# print(trainedWeightLogistic)
 
