@@ -22,8 +22,8 @@ def split_into_train_and_test(x_all_LF, frac_test=0.5, random_state=None):
 df = pd.read_csv("pima-indians-diabetes.csv")
 # print(df)
 train_MF, test_NF = split_into_train_and_test(df, frac_test=268/768, random_state=np.random.RandomState(0))
-print(train_MF.shape)
-print(test_NF.shape)
+# print(train_MF.shape)
+# print(test_NF.shape)
 
 # xTrain = df.drop("HasDiabetes",axis = 1)
 xTest = test_NF[:,:-1]
@@ -39,3 +39,21 @@ yTrain = train_MF[:,-1]
 xTrain = (xTrain - np.min(xTrain,axis = 0))/(np.max(xTrain,axis = 0)-np.min(xTrain,axis = 0))
 # print(xTrain)
 # print(np.max(xTrain,axis = 0))
+def sgdLinear(epoch,stepSize,fakeOnlineTrainX,fakeOnlineTrainY):
+    row,col = fakeOnlineTrainX.shape
+    dummColumn = np.ones((row,))
+    HBatch = np.column_stack((dummColumn, fakeOnlineTrainX))
+    weight = [0 for i in range(col+1)]
+    for t in range(epoch):
+        obser = np.random.randint(row)
+        input = HBatch[obser]
+        trueY = fakeOnlineTrainY[obser]
+        predict = weight@input
+
+        weight = weight - stepSize*(-2*input.T*( trueY-predict ))
+
+    return weight
+
+trainedWeight = sgdLinear(100,0.8,xTrain,yTrain)
+print(trainedWeight)
+
