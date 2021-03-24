@@ -26,6 +26,31 @@ x =np.array([
      ])
 y = [1,0,0,1,1,1,1,0,0,1]
 row, col = x.shape
+
+def recurSplit(sortOne, sortTwo, classError):
+    oneTarget = sortOne[:,-1]
+    twoTarget = sortTwo[:,-1]
+    if(np.count_nonzero(oneTarget) == len(oneTarget)/2):
+        return 0.5
+    if(np.count_nonzero(oneTarget) > len(oneTarget)/2):
+        # group Yes
+        curErrorOne = (len(oneTarget) - np.count_nonzero(oneTarget))/len(oneTarget)
+    else:
+        #group No
+        curErrorOne = np.count_nonzero(oneTarget) / len(oneTarget)
+
+    curError = 1e10
+    for i in range
+
+def decisionTree(xTrain,yTrain):
+    allData = np.c_[xTrain,yTrain]
+    sortOne = sorted(allData, key=lambda x: x[0])
+    sortTwo = sorted(allData, key=lambda x: x[1])
+    print(allData)
+    print(sortOne)
+    print(sortTwo)
+
+
 def logProb(scores):
     return 1/(1+np.exp(-scores))
 def accuray(HBatch,weights,yTest):
@@ -62,12 +87,12 @@ def Logistic(epsilon,stepSize,fakeOnlineTrainX,fakeOnlineTrainY):
     # print(preds)
 
     return weights,accArr
-weights,accurace = Logistic(30000,5e-4,x,y)
-# print(weights)
-plt.title("Epoch = 30000, eta = 5e-4")
-plt.plot(accurace)
-plt.xlabel("steps")
-plt.ylabel("SSE")
-plt.show()
-
+# weights,accurace = Logistic(30000,5e-4,x,y)
+# # print(weights)
+# plt.title("Epoch = 30000, eta = 5e-4")
+# plt.plot(accurace)
+# plt.xlabel("steps")
+# plt.ylabel("SSE")
+# plt.show()
+decisionTree(x,y)
 
