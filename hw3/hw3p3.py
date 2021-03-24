@@ -67,6 +67,8 @@ def cutedBranch(sortOne,sortTwo,curError,depth):
         cutedBranch(sortOne[:index],sortTwo[:index], smallerError, depth+1)
     if feature == 2:
         cutedBranch(sortOne[:index], sortTwo[:index], smallerError, depth+1)
+    if feature == 0:
+        return depth, curError
 
 def decisionTree(xTrain,yTrain):
     allData = np.c_[xTrain,yTrain]
@@ -74,7 +76,7 @@ def decisionTree(xTrain,yTrain):
     sortTwo = sorted(allData, key=lambda x: x[1])
     curError = thisGroupAndError(allData) / len(allData)
     depth = 0
-    cutedBranch(sortOne,sortTwo,curError,depth)
+    return cutedBranch(sortOne,sortTwo,curError,depth)
 
 
 
@@ -131,5 +133,6 @@ def Logistic(epsilon,stepSize,fakeOnlineTrainX,fakeOnlineTrainY):
 # plt.xlabel("steps")
 # plt.ylabel("SSE")
 # plt.show()
-decisionTree(x,y)
+depth, classError = decisionTree(x,y)
+print(depth,classError)
 
