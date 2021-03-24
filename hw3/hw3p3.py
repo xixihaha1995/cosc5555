@@ -50,6 +50,16 @@ def splitIndexAndError(sortOne,curError):
             splitIndex = i
     return curError,splitIndex
 
+def whichFeature(sortOne,sortTwo, curError):
+    oneErr, oneIndex = splitIndexAndError(sortOne, curError)
+    twoErr, twoIndex = splitIndexAndError(sortTwo, curError)
+
+    if (oneErr < curError) and (oneErr < twoErr):
+        #     split on feature one
+       return 1
+    if (twoErr < curError) and (twoErr < twoErr):
+        #     split on feature one
+        return 2
 
 def decisionTree(xTrain,yTrain):
     allData = np.c_[xTrain,yTrain]
@@ -58,16 +68,7 @@ def decisionTree(xTrain,yTrain):
     curError = thisGroupAndError(allData) / len(allData)
 
     depth = 0
-    oneErr,oneIndex = splitIndexAndError(sortOne)
-    twoErr,twoIndex = splitIndexAndError(sortTwo)
 
-    if (oneErr > curError) and(twoErr > curError):
-    #     stop
-        return 0
-    if (oneErr < curError) and (oneErr < twoErr):
-    #     split on feature one
-        depth += 1
-        splitIndexAndError(sortOne[:oneIndex],oneErr)
 
 
     print(allData)
