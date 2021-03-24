@@ -56,18 +56,30 @@ def whichFeature(sortOne,sortTwo, curError):
 
     if (oneErr < curError) and (oneErr < twoErr):
         #     split on feature one
-       return 1
+       return 1, oneErr,oneIndex
     if (twoErr < curError) and (twoErr < twoErr):
         #     split on feature one
-        return 2
+        return 2,twoErr, twoIndex
+
+def cutedBranch(sortOne,sortTwo,curError,depth):
+    feature,smallerError, index = whichFeature(sortOne,sortTwo,curError)
+    if feature == 1:
+        cutedBranch(sortOne[:index],sortTwo[:index], smallerError, depth+1)
+    if feature == 2:
+        cutedBranch(sortOne[:index], sortTwo[:index], smallerError, depth+1)
 
 def decisionTree(xTrain,yTrain):
     allData = np.c_[xTrain,yTrain]
     sortOne = sorted(allData, key=lambda x: x[0])
     sortTwo = sorted(allData, key=lambda x: x[1])
     curError = thisGroupAndError(allData) / len(allData)
-
     depth = 0
+    cutedBranch(sortOne,sortTwo,curError,depth)
+
+
+
+
+
 
 
 
