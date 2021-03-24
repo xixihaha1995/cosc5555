@@ -60,6 +60,8 @@ def whichFeature(sortOne,sortTwo, curError):
     if (twoErr < curError) and (twoErr < twoErr):
         #     split on feature one
         return 2,twoErr, twoIndex
+    if (oneErr > curError) and (twoErr > curError):
+        return 0, curError, 0
 
 def cutedBranch(sortOne,sortTwo,curError,depth):
     feature,smallerError, index = whichFeature(sortOne,sortTwo,curError)
@@ -68,7 +70,7 @@ def cutedBranch(sortOne,sortTwo,curError,depth):
     if feature == 2:
         cutedBranch(sortOne[:index], sortTwo[:index], smallerError, depth+1)
     if feature == 0:
-        return depth, curError
+        return depth, smallerError
 
 def decisionTree(xTrain,yTrain):
     allData = np.c_[xTrain,yTrain]
@@ -78,16 +80,6 @@ def decisionTree(xTrain,yTrain):
     depth = 0
     return cutedBranch(sortOne,sortTwo,curError,depth)
 
-
-
-
-
-
-
-
-    print(allData)
-    print(sortOne)
-    print(sortTwo)
 
 
 def logProb(scores):
