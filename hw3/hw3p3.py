@@ -65,12 +65,14 @@ def whichFeature(sortOne,sortTwo, curError):
 
 def cutedBranch(sortOne,sortTwo,curError,depth):
     feature,smallerError, index = whichFeature(sortOne,sortTwo,curError)
-    if feature == 1:
-        cutedBranch(sortOne[:index],sortTwo[:index], smallerError, depth+1)
-    if feature == 2:
-        cutedBranch(sortOne[:index], sortTwo[:index], smallerError, depth+1)
     if feature == 0:
         return depth, smallerError
+    if feature == 1:
+        newDepth, newError = cutedBranch(sortOne[:index],sortTwo[:index], smallerError, depth+1)
+    if feature == 2:
+        newDepth, newError =cutedBranch(sortOne[:index], sortTwo[:index], smallerError, depth+1)
+    return newDepth, newError
+
 
 def decisionTree(xTrain,yTrain):
     allData = np.c_[xTrain,yTrain]
