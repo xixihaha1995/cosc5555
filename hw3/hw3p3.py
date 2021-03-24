@@ -40,6 +40,7 @@ def thisGroupAndError(data):
     return   errCount
 
 def splitIndexAndError(sortOne,curError):
+    # for loop look for where to split
     for i in range(len(sortOne)):
         left = sortOne[:i]
         right = sortOne[i:]
@@ -47,7 +48,7 @@ def splitIndexAndError(sortOne,curError):
         if oneErr < curError:
             curError = oneErr
             splitIndex = i
-    return curError
+    return curError,splitIndex
 
 
 def decisionTree(xTrain,yTrain):
@@ -56,13 +57,17 @@ def decisionTree(xTrain,yTrain):
     sortTwo = sorted(allData, key=lambda x: x[1])
     curError = thisGroupAndError(allData) / len(allData)
 
-    oneErr = splitIndexAndError(sortOne)
-    twoErr = splitIndexAndError(sortTwo)
+    depth = 0
+    oneErr,oneIndex = splitIndexAndError(sortOne)
+    twoErr,twoIndex = splitIndexAndError(sortTwo)
 
     if (oneErr > curError) and(twoErr > curError):
     #     stop
         return 0
-    if (oneErr < curError) or (twoErr < curError):
+    if (oneErr < curError) and (oneErr < twoErr):
+    #     split on feature one
+        depth += 1
+        splitIndexAndError(sortOne[:oneIndex],oneErr)
 
 
     print(allData)
