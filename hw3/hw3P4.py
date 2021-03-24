@@ -90,7 +90,8 @@ def sgaLogistic(epoch,stepSize,fakeOnlineTrainX,fakeOnlineTrainY,xTest,yTest):
     row,col = fakeOnlineTrainX.shape
     dummColumn = np.ones((row,))
     HBatch = np.column_stack((dummColumn, fakeOnlineTrainX))
-    weight = np.array([0 for i in range(col+1)])
+    yBatch = fakeOnlineTrainY
+    weights = np.array([0 for i in range(col+1)])
     AlltimeWeight = []
     # print(weight.shape)
     sumLoss = 0
@@ -102,6 +103,14 @@ def sgaLogistic(epoch,stepSize,fakeOnlineTrainX,fakeOnlineTrainY,xTest,yTest):
         sample =  HBatch[obser]
         # print(sample.shape)
         # return
+
+        scores = np.dot(sample,weights)
+        prediction = logProb(scores)
+        errSignal = yBatch[obser] - prediction
+        gradient = np.dot(sample.T, errSignal)
+        # for j in range
+        weights = weights + stepSize * gradient
+
         Ind = fakeOnlineTrainY[obser]
         P =1/(1+np.exp(-1*(weight@sample)))
         thisPredicated = 0 if P < 0.5 else 1
@@ -121,57 +130,102 @@ def sgaLogistic(epoch,stepSize,fakeOnlineTrainX,fakeOnlineTrainY,xTest,yTest):
         l2Weights.append(thisL2Weights)
 
     return AlltimeWeight,aveLoss,l2Weights,SSEArr
+
+def logProb(scores):
+    return 1/(1+np.exp(-scores))
+def accuray(HBatch,weights,yTest):
+    # row, col = xTest.shape
+    # dummColumn = np.ones((row,))
+    # HBatch = np.column_stack((dummColumn, xTest))
+    scores = np.dot(HBatch,weights)
+    # print(scores)
+    prediction = logProb(scores)
+    # print(yTest,prediction)
+    SSE = np.sum((yTest - np.where(prediction > 0.5, 1, 0)) ** 2)
+    # print(SSE)
+    return SSE
+
+def Logistic(epoch,stepSize,fakeOnlineTrainX,fakeOnlineTrainY,xTest,yTest):
+    row,col = fakeOnlineTrainX.shape
+    dummColumn = np.ones((row,))
+    HBatch = np.column_stack((dummColumn, fakeOnlineTrainX))
+    yBatch = fakeOnlineTrainY
+    weights = np.array([0 for i in range(col+1)])
+    accArr = []
+    for t in range(epoch):
+        obser = np.random.randint(row)
+        sample = HBatch[obser]
+
+        scores = np.dot(sample,weights)
+        prediction = logProb(scores)
+        errSignal = yBatch[obser] - prediction
+        gradient = np.dot(sample.T, errSignal)
+        # for j in range
+        weights = weights + stepSize * gradient
+
+        accArr.append(accuray(HBatch, weights, yBatch))
+
+    return weights, accArr
+
+print(xTrain.shape)
+weights,accurace = Logistic(100000,0.025,xTrain,yTrain,xTest,yTest)
+# print(weights)
+# plt.title("Epoch = 100000, eta = 1e-5")
+plt.plot(accurace)
+plt.xlabel("steps")
+plt.ylabel("SSE")
+plt.show()
 # for stepSize in [0.8,1e-3,1-6]:
 #     trainedWeightLinear,aveLossLinear, l2WeightsLinear,SSEArrLinear = sgdLinear(100000,0.8,xTrain,yTrain,xTest,yTest)
 
 
-fig = plt.figure()
-ax1 = fig.add_subplot(131)
-ax2 = fig.add_subplot(132)
-ax3 = fig.add_subplot(133)
-
-bestModel = [[],0]
-minTestSSE = 1e10
-for stepSize in [0.8,1e-3,1e-5]:
-    AlltimeWeightLogistic, aveLossLogistic, l2WeightsLogistic, SSEArrLogistic = sgaLogistic(100000,stepSize,xTrain,yTrain,xTest,yTest)
-
-    if np.min(SSEArrLogistic) < minTestSSE:
-        minTestSSE = np.min(SSEArrLogistic)
-        timp100 = np.argmin(SSEArrLogistic)
-        bestModel[0] =  AlltimeWeightLogistic[timp100]
-        bestModel[1] = stepSize
-
-    ax1.plot(aveLossLogistic,label = "eta= "+str(stepSize))
-    ax2.plot(l2WeightsLogistic,label = "eta= "+str(stepSize))
-    ax3.plot(SSEArrLogistic,label = "eta= "+str(stepSize))
-
-    ax1.set_ylabel("aveLossLogistic")
-    ax2.set_ylabel("l2WeightsLogistic")
-    ax3.set_ylabel("SSEArrLogistic")
-    legend1 = ax1.legend(fontsize='x-large')
-    legend2 = ax2.legend(fontsize='x-large')
-    legend3 = ax3.legend(fontsize='x-large')
-
-
-fig2 = plt.figure()
-ax21 = fig2.add_subplot(131)
-ax22 = fig2.add_subplot(132)
-ax23 = fig2.add_subplot(133)
-
-for stepSize in [0.8,1e-3,1e-5]:
-    WeightLinear,aveLossLinear, l2WeightsLinear,SSEArrLinear = sgaLogistic(100000,stepSize,xTrain,yTrain,xTest,yTest)
-
-    ax21.plot(aveLossLinear,label = "eta= "+str(stepSize))
-    ax22.plot(l2WeightsLinear,label = "eta= "+str(stepSize))
-    ax23.plot(SSEArrLinear,label = "eta= "+str(stepSize))
-
-    ax21.set_ylabel("aveLossLinear")
-    ax22.set_ylabel("l2WeightsLinear")
-    ax23.set_ylabel("SSEArrLinear")
-    legend21 = ax21.legend(fontsize='x-large')
-    legend22 = ax22.legend(fontsize='x-large')
-    legend23 = ax23.legend(fontsize='x-large')
-
-plt.show()
+# fig = plt.figure()
+# ax1 = fig.add_subplot(131)
+# ax2 = fig.add_subplot(132)
+# ax3 = fig.add_subplot(133)
+#
+# bestModel = [[],0]
+# minTestSSE = 1e10
+# for stepSize in [0.8,1e-3,1e-5]:
+#     AlltimeWeightLogistic, aveLossLogistic, l2WeightsLogistic, SSEArrLogistic = sgaLogistic(100000,stepSize,xTrain,yTrain,xTest,yTest)
+#
+#     if np.min(SSEArrLogistic) < minTestSSE:
+#         minTestSSE = np.min(SSEArrLogistic)
+#         timp100 = np.argmin(SSEArrLogistic)
+#         bestModel[0] =  AlltimeWeightLogistic[timp100]
+#         bestModel[1] = stepSize
+#
+#     ax1.plot(aveLossLogistic,label = "eta= "+str(stepSize))
+#     ax2.plot(l2WeightsLogistic,label = "eta= "+str(stepSize))
+#     ax3.plot(SSEArrLogistic,label = "eta= "+str(stepSize))
+#
+#     ax1.set_ylabel("aveLossLogistic")
+#     ax2.set_ylabel("l2WeightsLogistic")
+#     ax3.set_ylabel("SSEArrLogistic")
+#     legend1 = ax1.legend(fontsize='x-large')
+#     legend2 = ax2.legend(fontsize='x-large')
+#     legend3 = ax3.legend(fontsize='x-large')
+#
+#
+# fig2 = plt.figure()
+# ax21 = fig2.add_subplot(131)
+# ax22 = fig2.add_subplot(132)
+# ax23 = fig2.add_subplot(133)
+#
+# for stepSize in [0.8,1e-3,1e-5]:
+#     WeightLinear,aveLossLinear, l2WeightsLinear,SSEArrLinear = sgaLogistic(100000,stepSize,xTrain,yTrain,xTest,yTest)
+#
+#     ax21.plot(aveLossLinear,label = "eta= "+str(stepSize))
+#     ax22.plot(l2WeightsLinear,label = "eta= "+str(stepSize))
+#     ax23.plot(SSEArrLinear,label = "eta= "+str(stepSize))
+#
+#     ax21.set_ylabel("aveLossLinear")
+#     ax22.set_ylabel("l2WeightsLinear")
+#     ax23.set_ylabel("SSEArrLinear")
+#     legend21 = ax21.legend(fontsize='x-large')
+#     legend22 = ax22.legend(fontsize='x-large')
+#     legend23 = ax23.legend(fontsize='x-large')
+#
+# plt.show()
 
 
