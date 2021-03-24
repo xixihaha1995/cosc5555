@@ -27,25 +27,44 @@ x =np.array([
 y = [1,0,0,1,1,1,1,0,0,1]
 row, col = x.shape
 
-def recurSplit(sortOne, sortTwo, classError):
-    oneTarget = sortOne[:,-1]
-    twoTarget = sortTwo[:,-1]
+def thisGroupAndError(data):
+    oneTarget = data[:,-1]
     if(np.count_nonzero(oneTarget) == len(oneTarget)/2):
-        return 0.5
+        return len(oneTarget)/2
     if(np.count_nonzero(oneTarget) > len(oneTarget)/2):
-        # group Yes
-        curErrorOne = (len(oneTarget) - np.count_nonzero(oneTarget))/len(oneTarget)
+        # group = 1
+        errCount = len(oneTarget) - np.count_nonzero(oneTarget)
     else:
-        #group No
-        curErrorOne = np.count_nonzero(oneTarget) / len(oneTarget)
+        # group = 0
+        errCount = np.count_nonzero(oneTarget)
+    return   errCount
 
-    curError = 1e10
-    for i in range
+def splitIndexAndError(sortOne,curError):
+    for i in range(len(sortOne)):
+        left = sortOne[:i]
+        right = sortOne[i:]
+        oneErr = (thisGroupAndError(left)+thisGroupAndError(right)) / len(sortOne)
+        if oneErr < curError:
+            curError = oneErr
+            splitIndex = i
+    return curError
+
 
 def decisionTree(xTrain,yTrain):
     allData = np.c_[xTrain,yTrain]
     sortOne = sorted(allData, key=lambda x: x[0])
     sortTwo = sorted(allData, key=lambda x: x[1])
+    curError = thisGroupAndError(allData) / len(allData)
+
+    oneErr = splitIndexAndError(sortOne)
+    twoErr = splitIndexAndError(sortTwo)
+
+    if (oneErr > curError) and(twoErr > curError):
+    #     stop
+        return 0
+    if (oneErr < curError) or (twoErr < curError):
+
+
     print(allData)
     print(sortOne)
     print(sortTwo)
