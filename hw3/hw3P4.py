@@ -123,19 +123,7 @@ def sgaLogistic(epoch,stepSize,fakeOnlineTrainX,fakeOnlineTrainY,xTest,yTest):
     return AlltimeWeight,aveLoss,l2Weights,SSEArr
 # for stepSize in [0.8,1e-3,1-6]:
 #     trainedWeightLinear,aveLossLinear, l2WeightsLinear,SSEArrLinear = sgdLinear(100000,0.8,xTrain,yTrain,xTest,yTest)
-#
-# fig, ax = plt.subplots()
-# ax.plot(aveLossLinear)
-# ax.set_ylabel("aveLossLinear")
-# fig2, ax2 = plt.subplots()
-# ax2.plot(l2WeightsLinear)
-# ax2.set_ylabel("l2WeightsLinear")
-# fig3, ax3 = plt.subplots()
-# ax3.plot(SSEArrLinear)
-# ax3.set_ylabel("SSEArrLinear")
-# plt.show()
 
-# WeightLogisticArr , aveLossLogisticArr, l2WeightsLogisticArr, SSEArrLogisticArr = [],[],[],[]
 
 fig = plt.figure()
 ax1 = fig.add_subplot(131)
@@ -163,6 +151,26 @@ for stepSize in [0.8,1e-3,1e-5]:
     legend1 = ax1.legend(fontsize='x-large')
     legend2 = ax2.legend(fontsize='x-large')
     legend3 = ax3.legend(fontsize='x-large')
+
+
+fig2 = plt.figure()
+ax21 = fig2.add_subplot(131)
+ax22 = fig2.add_subplot(132)
+ax23 = fig2.add_subplot(133)
+
+for stepSize in [0.8,1e-3,1e-5]:
+    WeightLinear,aveLossLinear, l2WeightsLinear,SSEArrLinear = sgaLogistic(100000,stepSize,xTrain,yTrain,xTest,yTest)
+
+    ax21.plot(aveLossLinear,label = "eta= "+str(stepSize))
+    ax22.plot(l2WeightsLinear,label = "eta= "+str(stepSize))
+    ax23.plot(SSEArrLinear,label = "eta= "+str(stepSize))
+
+    ax21.set_ylabel("aveLossLinear")
+    ax22.set_ylabel("l2WeightsLinear")
+    ax23.set_ylabel("SSEArrLinear")
+    legend21 = ax21.legend(fontsize='x-large')
+    legend22 = ax22.legend(fontsize='x-large')
+    legend23 = ax23.legend(fontsize='x-large')
 
 plt.show()
 

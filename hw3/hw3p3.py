@@ -25,30 +25,40 @@ x =np.array([
      ])
 y = [1,0,0,1,1,1,1,0,0,1]
 row, col = x.shape
-
+def logProb(scores):
+    return 1/(1+np.exp(-scores))
+def accuray(xTest,weights,yTest):
+    row, col = xTest.shape
+    dummColumn = np.ones((row,))
+    HBatch = np.column_stack((dummColumn, xTest))
+    scores = np.dot(HBatch,weights)
+    # print(scores)
+    prediction = logProb(scores)
+    # print(yTest,prediction)
+    SSE = np.sum((yTest - np.where(prediction > 0.5, 1, 0)) ** 2)
+    # print(SSE)
+    return SSE
 def Logistic(epsilon,stepSize,fakeOnlineTrainX,fakeOnlineTrainY):
     row,col = fakeOnlineTrainX.shape
     dummColumn = np.ones((row,))
     HBatch = np.column_stack((dummColumn, fakeOnlineTrainX))
     yBatch = fakeOnlineTrainY
-    weight = np.array([0 for i in range(col+1)])
-    partial = [10 for i in range(col+1)]
-    breakWhile = 100
-    # while(breakWhile > epsilon):
+    weights = np.array([0 for i in range(col+1)])
     for t in range(epsilon):
-        for j in range(col+1):
-            partial[j] = 0
-            for i in range(row):
-                # print(weight@HBatch[i])
-                # print(HBatch[i])
-                # return
-                P = 1 / (1 + np.exp(-1 * (weight.T @HBatch[i])))
-                hjFeature = HBatch[i,j]
-                partial[j] += hjFeature*(yBatch[i] - P)
-            weight[j] = weight[j] + stepSize*partial[j]
-        print(weight)
-        breakWhile = abs(np.max(partial))
-        # print(breakWhile)
-    return weight
-weight = Logistic(100,1e-4,x,y)
+        scores = np.dot(HBatch,weights)
+        prediction = logProb(scores)
+        errSignal = yBatch - prediction
+        gradient = np.dot(HBatch.T, errSignal)
+
+        weights = weights + stepSize * gradient
+
+    finalScore = np.dot(HBatch,weights)
+    preds =np.round(logProb(finalScore))
+    # print(preds)
+
+    return weights
+weights = Logistic(30000,5e-4,x,y)
+print(weights)
+
+accuray(x,weights,y)
 
