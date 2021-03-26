@@ -39,16 +39,19 @@ def errorCount(data):
         errCount = np.count_nonzero(oneTarget)
     return   errCount
 
-def splitIndexAndError(sortOne,curError):
+def splitIndexAndError(allData,feature):
+    if feature == 1:
+        sort = sorted(allData, key=lambda x: x[0])
+    if feature == 2:
+        sort = sorted(allData, key=lambda x: x[1])
     # for loop look for where to split
-    for i in range(len(sortOne)):
-        left = sortOne[:i]
-        right = sortOne[i:]
-        oneErr = (thisGroupAndError(left)+thisGroupAndError(right)) / len(sortOne)
-        if oneErr < curError:
-            curError = oneErr
-            splitIndex = i
-    return curError,splitIndex
+    splitErrDic = []
+    for i in range(len(sort)):
+        left = sort[:i]
+        right = sort[i:]
+        curErr = (errorCount(left)+errorCount(right)) / len(sort)
+        splitErrDic.append(curErr)
+    return min(splitErrDic), np.argmin(splitErrDic)
 
 def classificationError(err,data):
     return err/len(data)
@@ -65,40 +68,33 @@ def recur(parent, depth):
     if nextFeature == 1:
     #     split on 1
         sortOne = sorted(parent, key=lambda x: x[0])
-        leftErrNumber, leftDepth = recur(sortOne[:index])
-        rightErrNumber, rightDepth = recur(sortOne[index:])
+        leftErrNumber, leftDepth = recur(sortOne[:index],depth+1)
+        rightErrNumber, rightDepth = recur(sortOne[index:],depth+1)
     if nextFeature == 2:
-        sortTwo = sorted(parent, key=lambda x: x[0])
-        leftErrNumber, leftDepth = recur(sortTwo[:index])
-        rightErrNumber, rightDepth = recur(sortTwo[index:])
+        sortTwo = sorted(parent, key=lambda x: x[1])
+        leftErrNumber, leftDepth = recur(sortTwo[:index],depth+1)
+        rightErrNumber, rightDepth = recur(sortTwo[index:],depth+1)
     errNumber = rightErrNumber+leftErrNumber
     depthReturn = max(leftDepth,rightDepth)
     return errNumber,depthReturn
 
 
+def whichFeature(parent, parentErr):
+    # feature one possible {split:err}
+    # feature two possible {split:err}
+    # compare the minimum and parentErr
+    # return split, feature, index
 
+    oneErr, oneIndex = splitIndexAndError(parent, 1)
+    twoErr, twoIndex = splitIndexAndError(parent, 2)
 
-
-    if curErr >= parentErr:
-        # no split
-        return errNumber, depth
-
-    # child Error, child Feature
-
-    return depth, rightAndLeftErrCount
-
-def whichFeature(sortOne,sortTwo, curError):
-    oneErr, oneIndex = splitIndexAndError(sortOne, curError)
-    twoErr, twoIndex = splitIndexAndError(sortTwo, curError)
-
-    if (oneErr < curError) and (oneErr <= twoErr):
+    if (oneErr < parentErr) and (oneErr <= twoErr):
         #     split on feature one
-       return 1, oneErr,oneIndex
-    if (twoErr < curError) and (twoErr <= twoErr):
+       return 1, oneIndex
+    if (twoErr < parentErr) and (twoErr <= oneErr):
         #     split on feature one
-        return 2,twoErr, twoIndex
-    if (oneErr >= curError) and (twoErr >= curError):
-        return 0, curError, 0
+        return 2, twoIndex
+    return 0, 0
 
 def cutedBranch(sortOne,sortTwo,curError,depth):
     feature,smallerError, index = whichFeature(sortOne,sortTwo,curError)
@@ -114,11 +110,9 @@ def cutedBranch(sortOne,sortTwo,curError,depth):
 
 def decisionTree(xTrain,yTrain):
     allData = np.c_[xTrain,yTrain]
-    sortOne = sorted(allData, key=lambda x: x[0])
-    sortTwo = sorted(allData, key=lambda x: x[1])
-    curError = thisGroupAndError(allData) / len(allData)
-    depth = 0
-    return cutedBranch(sortOne,sortTwo,curError,depth)
+    totalErrNumber,finalDepth = recur(allData,0)
+    return totalErrNumber / len(allData), finalDepth
+
 
 
 
