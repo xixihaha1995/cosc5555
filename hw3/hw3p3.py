@@ -27,8 +27,25 @@ x =np.array([
 y = [1,0,0,1,1,1,1,0,0,1]
 row, col = x.shape
 
+
+def cutedBranch(sortOne,sortTwo,curError,depth):
+    feature,smallerError, index = whichFeature(sortOne,sortTwo,curError)
+    if feature == 0:
+        return depth, smallerError
+    if feature == 1:
+        newDepthLeft, newErroLeft = cutedBranch(sortOne[:index],sortTwo[:index], smallerError, depth+1)
+        newDepthRight, newErrorRight = cutedBranch(sortOne[index:], sortTwo[index:], smallerError, depth + 1)
+    if feature == 2:
+        newDepth, newError =cutedBranch(sortOne[:index], sortTwo[:index], smallerError, depth+1)
+    return newDepth, newError
+
+
+
 def errorCount(data):
+    # print(data)
+    # print(type(data))
     oneTarget = data[:,-1]
+    # print(type(oneTarget) )
     if(np.count_nonzero(oneTarget) == len(oneTarget)/2):
         return len(oneTarget)/2
     if(np.count_nonzero(oneTarget) > len(oneTarget)/2):
@@ -39,45 +56,23 @@ def errorCount(data):
         errCount = np.count_nonzero(oneTarget)
     return   errCount
 
-def splitIndexAndError(allData,feature):
-    if feature == 1:
-        sort = sorted(allData, key=lambda x: x[0])
-    if feature == 2:
-        sort = sorted(allData, key=lambda x: x[1])
-    # for loop look for where to split
-    splitErrDic = []
-    for i in range(len(sort)):
-        left = sort[:i]
-        right = sort[i:]
-        curErr = (errorCount(left)+errorCount(right)) / len(sort)
-        splitErrDic.append(curErr)
-    return min(splitErrDic), np.argmin(splitErrDic)
-
 def classificationError(err,data):
     return err/len(data)
 
-def recur(parent, depth):
-    # this Error
-    errNumber = classificationError(errorCount(parent))
-    parentErr = errNumber /len(parent)
-    # curErr
-    nextFeature, index = whichFeature(parent,parentErr)
-    if nextFeature == 0:
-        # no split
-        return errNumber, depth
-    if nextFeature == 1:
-    #     split on 1
-        sortOne = sorted(parent, key=lambda x: x[0])
-        leftErrNumber, leftDepth = recur(sortOne[:index],depth+1)
-        rightErrNumber, rightDepth = recur(sortOne[index:],depth+1)
-    if nextFeature == 2:
-        sortTwo = sorted(parent, key=lambda x: x[1])
-        leftErrNumber, leftDepth = recur(sortTwo[:index],depth+1)
-        rightErrNumber, rightDepth = recur(sortTwo[index:],depth+1)
-    errNumber = rightErrNumber+leftErrNumber
-    depthReturn = max(leftDepth,rightDepth)
-    return errNumber,depthReturn
-
+def splitIndexAndError(allData,feature):
+    if feature == 1:
+        sortd = sorted(allData, key=lambda x: x[0])
+    if feature == 2:
+        sortd = sorted(allData, key=lambda x: x[1])
+    # for loop look for where to split
+    sort = np.array(sortd)
+    splitErrDic = []
+    for i in range(len(sort)):
+        left = np.array(sort[:i,:])
+        right = np.array( sort[i:,:])
+        curErr = (errorCount(left)+errorCount(right)) / len(sort)
+        splitErrDic.append(curErr)
+    return min(splitErrDic), np.argmin(splitErrDic)
 
 def whichFeature(parent, parentErr):
     # feature one possible {split:err}
@@ -96,17 +91,28 @@ def whichFeature(parent, parentErr):
         return 2, twoIndex
     return 0, 0
 
-def cutedBranch(sortOne,sortTwo,curError,depth):
-    feature,smallerError, index = whichFeature(sortOne,sortTwo,curError)
-    if feature == 0:
-        return depth, smallerError
-    if feature == 1:
-        newDepthLeft, newErroLeft = cutedBranch(sortOne[:index],sortTwo[:index], smallerError, depth+1)
-        newDepthRight, newErrorRight = cutedBranch(sortOne[index:], sortTwo[index:], smallerError, depth + 1)
-    if feature == 2:
-        newDepth, newError =cutedBranch(sortOne[:index], sortTwo[:index], smallerError, depth+1)
-    return newDepth, newError
-
+def recur(parent, depth):
+    # this Error
+    errNumber = errorCount(parent)
+    # classificationError(,parent)
+    parentErr = errNumber /len(parent)
+    # curErr
+    nextFeature, index = whichFeature(parent,parentErr)
+    if nextFeature == 0:
+        # no split
+        return errNumber, depth
+    if nextFeature == 1:
+    #     split on 1
+        sortOne = sorted(parent, key=lambda x: x[0])
+        leftErrNumber, leftDepth = recur(np.array(sortOne[:index]),depth+1)
+        rightErrNumber, rightDepth = recur(np.array(sortOne[index:]),depth+1)
+    if nextFeature == 2:
+        sortTwo = sorted(parent, key=lambda x: x[1])
+        leftErrNumber, leftDepth = recur(np.array(sortTwo[:index]),depth+1)
+        rightErrNumber, rightDepth = recur(np.array(sortTwo[index:]),depth+1)
+    errNumber = rightErrNumber+leftErrNumber
+    depthReturn = max(leftDepth,rightDepth)
+    return errNumber,depthReturn
 
 def decisionTree(xTrain,yTrain):
     allData = np.c_[xTrain,yTrain]
@@ -159,6 +165,6 @@ def Logistic(epsilon,stepSize,fakeOnlineTrainX,fakeOnlineTrainY):
 # plt.xlabel("steps")
 # plt.ylabel("SSE")
 # plt.show()
-depth, classError = decisionTree(x,y)
+classError,depth = decisionTree(x,y)
 print(depth,classError)
 
