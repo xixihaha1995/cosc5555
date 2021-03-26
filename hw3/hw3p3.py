@@ -101,12 +101,19 @@ def recur(parent, depth):
     if nextFeature == 0:
         # no split
         return errNumber, depth
+
+
     if nextFeature == 1:
     #     split on 1
         sortOne = sorted(parent, key=lambda x: x[0])
+        forPrint = (parent[index,0]+parent[index+1,0])/2
+        # forPrint = parent[index, 0]
+        print("feature:" + str(nextFeature)+", "+str(forPrint))
         leftErrNumber, leftDepth = recur(np.array(sortOne[:index]),depth+1)
         rightErrNumber, rightDepth = recur(np.array(sortOne[index:]),depth+1)
     if nextFeature == 2:
+        forPrint = (parent[index,1]+parent[index+1,1])/2
+        print("feature:" + str(nextFeature)+", "+str(forPrint))
         sortTwo = sorted(parent, key=lambda x: x[1])
         leftErrNumber, leftDepth = recur(np.array(sortTwo[:index]),depth+1)
         rightErrNumber, rightDepth = recur(np.array(sortTwo[index:]),depth+1)
