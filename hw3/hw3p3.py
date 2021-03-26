@@ -54,13 +54,13 @@ def whichFeature(sortOne,sortTwo, curError):
     oneErr, oneIndex = splitIndexAndError(sortOne, curError)
     twoErr, twoIndex = splitIndexAndError(sortTwo, curError)
 
-    if (oneErr < curError) and (oneErr < twoErr):
+    if (oneErr < curError) and (oneErr <= twoErr):
         #     split on feature one
        return 1, oneErr,oneIndex
-    if (twoErr < curError) and (twoErr < twoErr):
+    if (twoErr < curError) and (twoErr <= twoErr):
         #     split on feature one
         return 2,twoErr, twoIndex
-    if (oneErr > curError) and (twoErr > curError):
+    if (oneErr >= curError) and (twoErr >= curError):
         return 0, curError, 0
 
 def cutedBranch(sortOne,sortTwo,curError,depth):
