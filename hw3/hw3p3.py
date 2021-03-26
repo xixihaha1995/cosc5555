@@ -27,7 +27,7 @@ x =np.array([
 y = [1,0,0,1,1,1,1,0,0,1]
 row, col = x.shape
 
-def thisGroupAndError(data):
+def errorCount(data):
     oneTarget = data[:,-1]
     if(np.count_nonzero(oneTarget) == len(oneTarget)/2):
         return len(oneTarget)/2
@@ -50,6 +50,43 @@ def splitIndexAndError(sortOne,curError):
             splitIndex = i
     return curError,splitIndex
 
+def classificationError(err,data):
+    return err/len(data)
+
+def recur(parent, depth):
+    # this Error
+    errNumber = classificationError(errorCount(parent))
+    parentErr = errNumber /len(parent)
+    # curErr
+    nextFeature, index = whichFeature(parent,parentErr)
+    if nextFeature == 0:
+        # no split
+        return errNumber, depth
+    if nextFeature == 1:
+    #     split on 1
+        sortOne = sorted(parent, key=lambda x: x[0])
+        leftErrNumber, leftDepth = recur(sortOne[:index])
+        rightErrNumber, rightDepth = recur(sortOne[index:])
+    if nextFeature == 2:
+        sortTwo = sorted(parent, key=lambda x: x[0])
+        leftErrNumber, leftDepth = recur(sortTwo[:index])
+        rightErrNumber, rightDepth = recur(sortTwo[index:])
+    errNumber = rightErrNumber+leftErrNumber
+    depthReturn = max(leftDepth,rightDepth)
+    return errNumber,depthReturn
+
+
+
+
+
+    if curErr >= parentErr:
+        # no split
+        return errNumber, depth
+
+    # child Error, child Feature
+
+    return depth, rightAndLeftErrCount
+
 def whichFeature(sortOne,sortTwo, curError):
     oneErr, oneIndex = splitIndexAndError(sortOne, curError)
     twoErr, twoIndex = splitIndexAndError(sortTwo, curError)
@@ -68,7 +105,8 @@ def cutedBranch(sortOne,sortTwo,curError,depth):
     if feature == 0:
         return depth, smallerError
     if feature == 1:
-        newDepth, newError = cutedBranch(sortOne[:index],sortTwo[:index], smallerError, depth+1)
+        newDepthLeft, newErroLeft = cutedBranch(sortOne[:index],sortTwo[:index], smallerError, depth+1)
+        newDepthRight, newErrorRight = cutedBranch(sortOne[index:], sortTwo[index:], smallerError, depth + 1)
     if feature == 2:
         newDepth, newError =cutedBranch(sortOne[:index], sortTwo[:index], smallerError, depth+1)
     return newDepth, newError
