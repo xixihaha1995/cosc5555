@@ -27,17 +27,17 @@ x =np.array([
 y = [1,0,0,1,1,1,1,0,0,1]
 row, col = x.shape
 
-
-def cutedBranch(sortOne,sortTwo,curError,depth):
-    feature,smallerError, index = whichFeature(sortOne,sortTwo,curError)
-    if feature == 0:
-        return depth, smallerError
-    if feature == 1:
-        newDepthLeft, newErroLeft = cutedBranch(sortOne[:index],sortTwo[:index], smallerError, depth+1)
-        newDepthRight, newErrorRight = cutedBranch(sortOne[index:], sortTwo[index:], smallerError, depth + 1)
-    if feature == 2:
-        newDepth, newError =cutedBranch(sortOne[:index], sortTwo[:index], smallerError, depth+1)
-    return newDepth, newError
+#
+# def cutedBranch(sortOne,sortTwo,curError,depth):
+#     feature,smallerError, index = whichFeature(sortOne,sortTwo,curError)
+#     if feature == 0:
+#         return depth, smallerError
+#     if feature == 1:
+#         newDepthLeft, newErroLeft = cutedBranch(sortOne[:index],sortTwo[:index], smallerError, depth+1)
+#         newDepthRight, newErrorRight = cutedBranch(sortOne[index:], sortTwo[index:], smallerError, depth + 1)
+#     if feature == 2:
+#         newDepth, newError =cutedBranch(sortOne[:index], sortTwo[:index], smallerError, depth+1)
+#     return newDepth, newError
 
 
 
