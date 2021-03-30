@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+from sklearn import metrics
+from collections import Counter
 
 
 
@@ -22,7 +24,7 @@ def oneHotEnc(bank):
     for column in bank:
         if column == 'y':
             temp = bank.y.astype('category').cat.codes
-            print(type(temp))
+            # print(type(temp))
         else:
             if bank[column].dtypes == object:
                 temp = pd.get_dummies(bank[column], prefix=column)
@@ -51,7 +53,21 @@ def accuray(xTest,weights,yTest,Bias):
     # print(yTest,prediction)
     SSE = np.sum((yTest - np.where(prediction > 0.5, 1, 0)) ** 2)
     # print(SSE)
+    # if np.count_nonzero(np.where(prediction > 0.5, 1, 0)) > 0:
+    #     # print("I got 1")
     return SSE
+
+def predicted(xTest,weights,Bias):
+    if Bias == 1:
+        row, col = xTest.shape
+        dummColumn = np.ones((row,))
+        HBatch = np.column_stack((dummColumn, xTest))
+    else:
+        HBatch = xTest
+    scores = np.dot(HBatch,weights)
+    prediction = logProb(scores)
+
+    return np.where(prediction > 0.5, 1, 0)
 
 
 
@@ -114,8 +130,9 @@ yTrain = train_MF[:,-1]
 xTrain = (xTrain - np.min(xTrain,axis = 0))/(np.max(xTrain,axis = 0)-np.min(xTrain,axis = 0))
 xTest = (xTest - np.min(xTest,axis = 0))/(np.max(xTest,axis = 0)-np.min(xTest,axis = 0))
 # print(xTrain)
-# print(yTrain)
-
+# print(Counter(yTest))
+# print(np.count_nonzero(yTest))
+#
 fig = plt.figure()
 ax1 = fig.add_subplot(131)
 ax2 = fig.add_subplot(132)
@@ -123,7 +140,7 @@ ax3 = fig.add_subplot(133)
 
 bestModel = [[],0,0,0]
 minTestSSE = 1e10
-for stepSize in [0.8,1e-3,1e-5]:
+for stepSize in [1e-1,1e-2,1e-3,1e-4,1e-5,1e-6]:
     AlltimeWeightLogistic, aveLossLogistic, l2WeightsLogistic, SSEArrLogistic = sgaLogistic(100000,stepSize,xTrain,yTrain,xTest,yTest)
 
     if np.min(SSEArrLogistic) < minTestSSE:
@@ -145,6 +162,12 @@ for stepSize in [0.8,1e-3,1e-5]:
     legend2 = ax2.legend(fontsize='x-large')
     legend3 = ax3.legend(fontsize='x-large')
 
-plt.show()
+
+
+# plt.show()
+pred = predicted(xTest,bestModel[0],1)
+fpr, tpr, thresholds = metrics.roc_curve(yTest, pred)
+print(metrics.auc(fpr, tpr))
+
 
 
