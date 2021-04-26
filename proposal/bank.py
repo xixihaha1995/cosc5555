@@ -114,9 +114,13 @@ def sgaLogistic(epoch,stepSize,fakeOnlineTrainX,fakeOnlineTrainY,xTest,yTest):
 
     return AlltimeWeight,aveLoss,l2Weights,SSEArr
 
+print("original data")
 bank = pd.read_csv("bank.csv",delimiter=';')
+print(bank.head())
+print("after oneHotEncoding")
 df = oneHotEnc(bank)
 df.rename(columns = {0:'y'}, inplace = True)
+print(df.head())
 
 train_MF, test_NF = split_into_train_and_test(df, frac_test=0.3, random_state=np.random.RandomState(0))
 xTest = test_NF[:,:-1]
@@ -164,9 +168,10 @@ for stepSize in [1e-1,1e-2,1e-3,1e-4,1e-5,1e-6]:
 
 
 
-# plt.show()
+plt.show()
 pred = predicted(xTest,bestModel[0],1)
 fpr, tpr, thresholds = metrics.roc_curve(yTest, pred)
+print(bestModel)
 print(metrics.auc(fpr, tpr))
 
 
