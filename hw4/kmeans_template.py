@@ -94,7 +94,7 @@ def assign(X, Mu):
     Mu is the kxD matrix of cluster centroids.
     """
     # TODO: Compute the assignments z.
-    print(Mu)
+    # print(Mu)
     z = []
     for entry in X:
         temK = 0
@@ -105,7 +105,8 @@ def assign(X, Mu):
                 temMin = curMin
                 temK = ind
         z.append(temK)
-    print(z)
+    # print(z)
+    # print(len(z))
     return z
 
 
@@ -118,7 +119,18 @@ def update(X, z, k):
     k is the number of clusters.
     """
     # TODO: Compute the cluster centroids Mu.
-    Mu = None
+    Mu = []
+    for clu in range(k):
+        indexes = [i for i, x in enumerate(z) if x == clu]
+        curTotal = []
+        for ind in indexes:
+            curTotal.append(X[ind])
+        tempCurTotal = np.array(curTotal)
+        curMean = tempCurTotal.mean(0)
+        # print(curMean.shape)
+        Mu.append(curMean)
+    Mu = np.array(Mu)
+    # print(Mu.shape)
     return Mu
 
 
