@@ -15,7 +15,7 @@ def analyze_kmeans():
     y = np.genfromtxt("labels.txt", dtype=int)
     distortions = []
     errs = []
-    ks = range(1, 3)
+    ks = range(1, 11)
     for k in ks:
         distortion, err = analyze_one_k(X, y, k)
         distortions.append(distortion)
@@ -146,12 +146,11 @@ def compute_distortion(X, Mu, z):
     # print(len(Mu))
     for clu in range(len(Mu)):
         indexes = [i for i, x in enumerate(z) if x == clu]
-        curDis = 0
         for ind in indexes:
-            curDis+= (np.sum((X[ind]  - Mu[clu])**2))**1/2**2
-        tempdistortion+=curDis
-    # distortion = np.array(tempdistortion)
-    print(tempdistortion)
+            tempdistortion+= (np.sum((X[ind]  - Mu[clu])**2))**1/2**2
+    #     tempdistortion+=curDis
+    # # distortion = np.array(tempdistortion)
+    # print(tempdistortion)
     return tempdistortion
 
 
