@@ -140,7 +140,16 @@ def compute_distortion(X, Mu, z):
     data X, kxD centroids Mu, and Nx1 assignments z.
     """
     # TODO: Compute the within-group sum of squares (the distortion).
-    distortion = None
+    tempdistortion = []
+    # print(len(Mu))
+    for clu in range(len(Mu)):
+        indexes = [i for i, x in enumerate(z) if x == clu]
+        curDis = 0
+        for ind in indexes:
+            curDis+= (np.sum((X[ind]  - Mu[clu])**2))**1/2**2
+        tempdistortion.append(curDis)
+    distortion = np.array(tempdistortion)
+    # print(distortion.shape)
     return distortion
 
 
