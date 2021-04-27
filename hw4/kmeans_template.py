@@ -15,12 +15,13 @@ def analyze_kmeans():
     y = np.genfromtxt("labels.txt", dtype=int)
     distortions = []
     errs = []
-    ks = range(1, 11)
+    ks = range(1, 3)
     for k in ks:
         distortion, err = analyze_one_k(X, y, k)
         distortions.append(distortion)
         errs.append(err)
     fig, ax = plt.subplots(2, figsize=(8, 6))
+
     ax[0].plot(ks, distortions, marker=".")
     ax[0].set_ylabel("Distortion")
     ax[1].plot(ks, errs, marker=".")
@@ -81,6 +82,7 @@ def cluster(X, y, k, n_starts=5):
     # Main function body
     print ("Performing clustering.")
     results = [loop(X, i) for i in range(n_starts)]
+    # print(results)
     best = min(results, key=lambda entry: entry["distortion"])
     best["digits"] = label_clusters(y, k, best["z"])
     return best
@@ -140,17 +142,17 @@ def compute_distortion(X, Mu, z):
     data X, kxD centroids Mu, and Nx1 assignments z.
     """
     # TODO: Compute the within-group sum of squares (the distortion).
-    tempdistortion = []
+    tempdistortion = 0
     # print(len(Mu))
     for clu in range(len(Mu)):
         indexes = [i for i, x in enumerate(z) if x == clu]
         curDis = 0
         for ind in indexes:
             curDis+= (np.sum((X[ind]  - Mu[clu])**2))**1/2**2
-        tempdistortion.append(curDis)
-    distortion = np.array(tempdistortion)
-    # print(distortion.shape)
-    return distortion
+        tempdistortion+=curDis
+    # distortion = np.array(tempdistortion)
+    print(tempdistortion)
+    return tempdistortion
 
 
 def initialize(X, k):
