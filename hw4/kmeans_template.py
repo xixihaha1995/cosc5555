@@ -168,6 +168,8 @@ def initialize(X, k):
     # print(Mu.shape)
     return Mu
 
+def most_common(lst):
+    return max(set(lst), key=lst.count)
 
 def label_clusters(y, k, z):
     """
@@ -182,7 +184,15 @@ def label_clusters(y, k, z):
     z is the Nx1 vector of cluster assignments.
     """
     # TODO: Compute the cluster labelings.
-    labels = None
+    labels = []
+    for clu in range(k):
+        indexes = [i for i, x in enumerate(z) if x == clu]
+        curTotal = []
+        for ind in indexes:
+            curTotal.append(y[ind])
+        culab = most_common(curTotal)
+        labels.append(culab)
+    labels = np.array(labels)
     return labels
 
 
