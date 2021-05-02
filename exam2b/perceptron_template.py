@@ -38,6 +38,7 @@ def linear_kernel(u, v):
     """
     # TODO: Implement the linear kernel function.
     pass
+    return np.dot(u,v)+1
 
 
 def make_polynomial_kernel(d):
@@ -69,7 +70,7 @@ def compute_y_hat(x_t, y_mistake, X_mistake, kernel):
         gotten wrong so far.
     X_mistake is a matrix whose ith row is the ith input that the algorithm got
         wrong so far.
-    kernel takes two vectors u, vand returns K(u, v).
+    kernel takes two vectors u, v and returns K(u, v).
     """
     def sign(x): return 1 if x >= 0 else -1
     n_mistake = len(y_mistake)
@@ -78,6 +79,10 @@ def compute_y_hat(x_t, y_mistake, X_mistake, kernel):
     else:
         # TODO: Compute y hat.
         pass
+        weihtT = 0
+        for ithmis in n_mistake:
+            weihtT+= y_mistake[ithmis] * kernel(X_mistake[ithmis],x_t)
+        return sign(weihtT)
 
 
 def compute_loss(m):
@@ -106,7 +111,9 @@ def fit_perceptron(df, kernel):
         # length-N vector of any type, you can grab the elements of x, where b
         # is True with x[b]. Try it. Similarly, if X is an N-by-D matrix, you
         # can grab the rows of X where b is True with X[b].
-        x_t = None              # Put in your values for these variables.
+
+        # Put in your values for these variables.
+        x_t = None
         y_t = None
         y_mistake = None
         X_mistake = None
