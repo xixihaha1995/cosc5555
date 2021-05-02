@@ -49,6 +49,7 @@ def make_polynomial_kernel(d):
     def kernel(u, v):
         # TODO: Implement the polynomial kernel function.
         pass
+        return (np.dot(u,v)+1)**d
 
     return kernel
 
@@ -57,9 +58,10 @@ def exponential_kernel(u, v):
     """
     Computes the exponential kernel between vectors u and v, with sigma = 10.
     """
-    sigma = 10
+    sigma = 1000
     # TODO: Implement the exponential kernel function.
     pass
+    return np.exp(-1 * np.sum((u-v)**2) /2 / sigma**2)
 
 
 
@@ -80,7 +82,7 @@ def compute_y_hat(x_t, y_mistake, X_mistake, kernel):
         # TODO: Compute y hat.
         pass
         weihtT = 0
-        for ithmis in n_mistake:
+        for ithmis in range(n_mistake):
             weihtT+= y_mistake[ithmis] * kernel(X_mistake[ithmis],x_t)
         return sign(weihtT)
 
@@ -113,10 +115,10 @@ def fit_perceptron(df, kernel):
         # can grab the rows of X where b is True with X[b].
 
         # Put in your values for these variables.
-        x_t = None
-        y_t = None
-        y_mistake = None
-        X_mistake = None
+        x_t = X[t]
+        y_t = y[t]
+        y_mistake = y[m]
+        X_mistake = X[m]
         y_hat = compute_y_hat(x_t, y_mistake, X_mistake, kernel)
         if y_hat != y_t:
             m[t] = True         # Store the mistake if the model guessed wrong.
@@ -160,7 +162,7 @@ def run_polynomial_kernel():
 def run_poly_expon():
     "Analysis for part 3"
     # TODO: Supply the best-performing degree for the polynomial kernel
-    best_degree = None          # Put in your value.
+    best_degree = 3          # Put in your value.
     data = get_data()
     test = data["test"]
     kernel_poly = make_polynomial_kernel(best_degree)
