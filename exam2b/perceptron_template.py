@@ -93,6 +93,7 @@ def compute_loss(m):
     1000. 
     """
     loss = np.cumsum(m) / np.arange(1, len(m) + 1)
+    print(loss.shape)
     return pd.Series(loss[99::100], np.arange(100, 1100, 100))
 
 
