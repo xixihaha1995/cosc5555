@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as pltcolors
 import pandas as pd
 import math
+import seaborn as sns
 
 
 def plotLine(ax, xRange, w, x0, label, color='grey', linestyle='-', alpha=1.):
@@ -100,23 +101,38 @@ def generateBatchBipolar(n,mu = 0.5, sigma = 0.2):
     X *= y[:,np.newaxis]
     X -= X.mean(axis= 0)
     return X, y
+
+def heatmap(data):
+    # sns.set_theme()
+    # ax = sns.heatmap(data)
+    corr = data.corr()
+    # corr.style.background_gradient(cmap = 'coolwarm').set_precision(2)
+    # plt.matshow(corr)
+    sns.heatmap(corr,annot = True)
+    # sns.savefig("linear-kernel")
+    plt.show()
+
 def csvToArray():
     bank = pd.read_csv("bank.csv", delimiter=';')
-    print(bank.head())
-    print("after oneHotEncoding")
+    # print(bank.head())
+    # print("after oneHotEncoding")
     df = oneHotEnc(bank)
+
     df.rename(columns={0: 'y'}, inplace=True)
     # print(type(df))
-    print(df.head())
+    # print(df.head())
 
     train_MF, test_NF = split_into_train_and_test(df, frac_test=0.3, random_state=np.random.RandomState(0))
     xTest = test_NF[:, :-1]
     yTest = test_NF[:, -1]
 
-    print(type(xTest))
+    # print("xTest shape")
+    # print(len(xTest))
+    # print(len(xTest[0]))
     # print(np.count_nonzero(yTest))
     xTrain = train_MF[:, :-1]
     yTrain = train_MF[:, -1]
+    #print correlation map
 
 
 colors = ['blue','red']
@@ -127,7 +143,8 @@ N = 100
 def main():
     testObject = testNumpyFeature()
     X, y = generateBatchBipolar(10)
-    testObject.newAxis(X,y)
+    # testObject.newAxis(X,y)
+    csvToArray()
 
 if __name__ == "__main__":
     main()
