@@ -41,6 +41,8 @@ def plotSvm(X, y, support=None, w=None, intercept=0., label='Data', separatorLab
     ax.grid()
     # ax.set_xlim(bound[0])
     # ax.set_ylim(bound[1])
+    ax.set_xlabel("age")
+    ax.set_ylabel("balance")
     cb = plt.colorbar(im, ax=ax)
     loc = np.arange(-1, 1, 1)
     cb.set_ticks(loc)
@@ -132,9 +134,10 @@ def csvToArray():
     xTrain = train_MF[:, :-1]
     yTrain = train_MF[:, -1]
 
-    xTrain2DPlot = train_MF[:, [0, 4,5,6]]
+    xTrain2DPlot = train_MF[:, [0,22]]
+    # the above is 2d X
     print(xTrain2DPlot)
-    # print(xTrain2DPlot.shape)
+    print(xTrain2DPlot.shape)
     # print(yTrain)
     # print(yTrain.shape)
     #print correlation map
