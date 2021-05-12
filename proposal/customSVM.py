@@ -55,18 +55,34 @@ class customizedKernelSVM:
 
 class testNumpyFeature:
     def newAxis(self,X,y):
-        print(type(X))
-        print(X.shape)
-        print(y.shape)
-        print(y[:,np.newaxis])
-        print(y.shape)
+        print(X)
+        print(np.ones_like(X))
+        print(X[:, np.newaxis])
+        # print(type(X))
+        # print(X.shape)
+        # print(y.shape)
+        # print(y[:,np.newaxis])
+        # print(y.shape)
         # print(X*y[:,np.newaxis])
 class MaxMarginClassifier:
     def __init__(self):
         self.alpha = None
         self.w = None
         self.supportVectors  = None
+    def fit(self, X,y):
+        N = len(y)
+        Xy = X*y[:,np.newaxis]
+        GramyXy = np.matmul(Xy, Xy.T)
 
+        def Ld0(G,alpha):
+            return alpha.sum() - 0.5 * alpha.dot(alpha.dot(G))
+
+        def Ld0dAlpha(G,alpha):
+            return np.ones_like(alpha) - alpha.dot(G)
+
+        A = -np.eye(N)
+        b = np.zeros(N)
+        constraints = ({'type':'eq','fun':lambda a: np.dot(a,y),'jac'})
 def split_into_train_and_test(x_all_LF, frac_test=0.5, random_state=None):
 
     if random_state is None:
@@ -152,8 +168,8 @@ N = 100
 
 def main():
     testObject = testNumpyFeature()
-    # X, y = generateBatchBipolar(10)
-    # testObject.newAxis(X,y)
+    X, y = generateBatchBipolar(10)
+    testObject.newAxis(X,y)
     csvToArray()
 
 if __name__ == "__main__":
