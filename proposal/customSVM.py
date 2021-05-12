@@ -117,8 +117,9 @@ def csvToArray():
     # print(bank.head())
     # print("after oneHotEncoding")
     df = oneHotEnc(bank)
-
     df.rename(columns={0: 'y'}, inplace=True)
+    # heat map is used for illustration
+    # heatmap(df)
     # print(type(df))
     # print(df.head())
 
@@ -141,8 +142,8 @@ nFeatures = 2
 N = 100
 
 def main():
-    testObject = testNumpyFeature()
-    X, y = generateBatchBipolar(10)
+    # testObject = testNumpyFeature()
+    # X, y = generateBatchBipolar(10)
     # testObject.newAxis(X,y)
     csvToArray()
 
