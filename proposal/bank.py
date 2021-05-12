@@ -120,11 +120,14 @@ print(bank.head())
 print("after oneHotEncoding")
 df = oneHotEnc(bank)
 df.rename(columns = {0:'y'}, inplace = True)
+# print(type(df))
 print(df.head())
 
 train_MF, test_NF = split_into_train_and_test(df, frac_test=0.3, random_state=np.random.RandomState(0))
 xTest = test_NF[:,:-1]
 yTest = test_NF[:,-1]
+
+print(type(xTest))
 # print(np.count_nonzero(yTest))
 xTrain = train_MF[:,:-1]
 yTrain = train_MF[:,-1]

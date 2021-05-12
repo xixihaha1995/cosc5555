@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as pltcolors
+import pandas as pd
+import math
 
 
 def plotLine(ax, xRange, w, x0, label, color='grey', linestyle='-', alpha=1.):
@@ -49,10 +51,47 @@ class customizedKernelSVM:
 
 class testNumpyFeature:
     def newAxis(self,X,y):
+        print(type(X))
         print(X)
         print(y)
         print(y[:,np.newaxis])
         print(X*y[:,np.newaxis])
+class MaxMarginClassifier:
+    def __init__(self):
+        self.alpha = None
+        self.w = None
+        self.supportVectors  = None
+
+def split_into_train_and_test(x_all_LF, frac_test=0.5, random_state=None):
+
+    if random_state is None:
+        random_state = np.random
+
+    exam,fea = x_all_LF.shape
+    N = math.ceil(frac_test*exam)
+
+    # np.random.RandomState(random_state)
+    temp = random_state.permutation(x_all_LF)
+    x_test_NF = temp[0:N,:]
+    x_train_MF = temp[N:,:]
+    return x_train_MF, x_test_NF
+
+def oneHotEnc(bank):
+    for column in bank:
+        if column == 'y':
+            temp = bank.y.astype('category').cat.codes
+            # print(type(temp))
+        else:
+            if bank[column].dtypes == object:
+                temp = pd.get_dummies(bank[column], prefix=column)
+            else:
+                temp =  bank[column]
+        try:
+            # s.append(temp)
+            s = pd.concat([s, temp], axis=1)
+        except NameError:
+            s = pd.DataFrame(data=temp)
+    return s
 
 def generateBatchBipolar(n,mu = 0.5, sigma = 0.2):
     X = np.random.normal(mu,sigma,(n,2))
@@ -61,6 +100,24 @@ def generateBatchBipolar(n,mu = 0.5, sigma = 0.2):
     X *= y[:,np.newaxis]
     X -= X.mean(axis= 0)
     return X, y
+def csvToArray():
+    bank = pd.read_csv("bank.csv", delimiter=';')
+    print(bank.head())
+    print("after oneHotEncoding")
+    df = oneHotEnc(bank)
+    df.rename(columns={0: 'y'}, inplace=True)
+    # print(type(df))
+    print(df.head())
+
+    train_MF, test_NF = split_into_train_and_test(df, frac_test=0.3, random_state=np.random.RandomState(0))
+    xTest = test_NF[:, :-1]
+    yTest = test_NF[:, -1]
+
+    print(type(xTest))
+    # print(np.count_nonzero(yTest))
+    xTrain = train_MF[:, :-1]
+    yTrain = train_MF[:, -1]
+
 
 colors = ['blue','red']
 cmap = pltcolors.ListedColormap(colors)
