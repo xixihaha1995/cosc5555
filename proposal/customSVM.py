@@ -39,13 +39,14 @@ def plotSvm(X, y, support=None, w=None, intercept=0., label='Data', separatorLab
             ax.set_title('Margin = %.3f' % (margin))
     ax.legend(loc='upper left')
     ax.grid()
-    ax.set_xlim(bound[0])
-    ax.set_ylim(bound[1])
+    # ax.set_xlim(bound[0])
+    # ax.set_ylim(bound[1])
     cb = plt.colorbar(im, ax=ax)
     loc = np.arange(-1, 1, 1)
     cb.set_ticks(loc)
     cb.set_ticklabels(['-1', '1'])
 
+    plt.show()
 class customizedKernelSVM:
     def __init__(self,C):
         pass
@@ -53,10 +54,11 @@ class customizedKernelSVM:
 class testNumpyFeature:
     def newAxis(self,X,y):
         print(type(X))
-        print(X)
-        print(y)
+        print(X.shape)
+        print(y.shape)
         print(y[:,np.newaxis])
-        print(X*y[:,np.newaxis])
+        print(y.shape)
+        # print(X*y[:,np.newaxis])
 class MaxMarginClassifier:
     def __init__(self):
         self.alpha = None
@@ -127,13 +129,17 @@ def csvToArray():
     xTest = test_NF[:, :-1]
     yTest = test_NF[:, -1]
 
-    # print("xTest shape")
-    # print(len(xTest))
-    # print(len(xTest[0]))
-    # print(np.count_nonzero(yTest))
     xTrain = train_MF[:, :-1]
     yTrain = train_MF[:, -1]
+
+    xTrain2DPlot = train_MF[:, [0, 4,5,6]]
+    print(xTrain2DPlot)
+    # print(xTrain2DPlot.shape)
+    # print(yTrain)
+    # print(yTrain.shape)
     #print correlation map
+
+    plotSvm(xTrain2DPlot,yTrain)
 
 
 colors = ['blue','red']
@@ -142,7 +148,7 @@ nFeatures = 2
 N = 100
 
 def main():
-    # testObject = testNumpyFeature()
+    testObject = testNumpyFeature()
     # X, y = generateBatchBipolar(10)
     # testObject.newAxis(X,y)
     csvToArray()
