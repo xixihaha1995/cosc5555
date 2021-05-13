@@ -54,10 +54,19 @@ class customizedKernelSVM:
         pass
 
 class testNumpyFeature:
+    def kernel(self,x1,x2):
+
+        # return (x1*x2)+1
+        diff  = x1 - x2
+        return np.exp(-np.dot(diff,diff)*len(x1)/2)
+
     def newAxis(self,X,y):
+        # hXX = np.apply_along_axis(lambda x2: self.kernel(x2, x2), 1, X)
+        hXX = np.apply_along_axis(lambda x1: np.apply_along_axis(lambda x2: self.kernel(x1, x2), 1, X), 1, X)
+        print(len(X[0]))
         print(X)
-        print(np.ones_like(X))
-        print(X[:, np.newaxis])
+        print(len(hXX[0]))
+        print(hXX)
         # print(type(X))
         # print(X.shape)
         # print(y.shape)
@@ -82,7 +91,30 @@ class MaxMarginClassifier:
 
         A = -np.eye(N)
         b = np.zeros(N)
-        constraints = ({'type':'eq','fun':lambda a: np.dot(a,y),'jac'})
+        constraints = ({'type':'eq','fun':lambda a: np.dot(a,y),'jac':lambda a:y})
+
+class KernelSvm:
+    def __init__(self,C ,kernel):
+        self.C = C
+        self.kernel = kernel
+        self.alpha = None
+        self.supportVectors = None
+
+    def fit(self, X,y):
+        N = len(y)
+        hXX = np.apply_along_axis(lambda x1:np.apply_along_axis(lambda x2: self.kernel(x1,x2),1,X),1,X)
+
+        yp = y.reshape(-1,1)
+        GramHXy = hXX* np.matmul(yp,yp.T)
+
+        def Ld0(G,alpha):
+            return alpha.sum() - 0.5 * alpha.dot(alpha.dot(G))
+        def Ld0Alpha(G,alpha):
+            return np.ones_like(alpha) - alpha.dot(G)
+        A = np.vstack((-np.eye(N),np.eye(N)))
+        b = np.hstack((np.zeros(N), self.C*np.ones(N)))
+
+
 def split_into_train_and_test(x_all_LF, frac_test=0.5, random_state=None):
 
     if random_state is None:
@@ -167,9 +199,9 @@ nFeatures = 2
 N = 100
 
 def main():
-    testObject = testNumpyFeature()
-    X, y = generateBatchBipolar(10)
-    testObject.newAxis(X,y)
+    # testObject = testNumpyFeature()
+    # X, y = generateBatchBipolar(10)
+    # testObject.newAxis(X,y)
     csvToArray()
 
 if __name__ == "__main__":
