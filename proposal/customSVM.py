@@ -4,6 +4,7 @@ import matplotlib.colors as pltcolors
 import pandas as pd
 import math
 import seaborn as sns
+from scipy import optimize
 
 
 def plotLine(ax, xRange, w, x0, label, color='grey', linestyle='-', alpha=1.):
@@ -113,6 +114,24 @@ class KernelSvm:
             return np.ones_like(alpha) - alpha.dot(G)
         A = np.vstack((-np.eye(N),np.eye(N)))
         b = np.hstack((np.zeros(N), self.C*np.ones(N)))
+
+        constraints = ({'type':'eq', 'fun':lambda a:np.dot(a,y), 'jac': lambda a:y},
+                       {'type': 'ineq', 'fun': lambda a: b- np.dot(A, y), 'jac': lambda a: -A},
+                       )
+        optres = optimize.minimize(fun = lambda a: -Ld0(GramHXy,a),
+                                   x0 = np.ones(N),
+                                   method = 'SLSQP',
+                                   jac = lambda a:-Ld0Alpha(GramHXy,a),
+                                   constraints = constraints
+                                   )
+        self.alpha = optres.x
+        epsilon = 1e-8
+        supportIndices = self.alpha > epsilon
+        self.supportVectors = X[supportIndices]
+        self.supportAlphaY = y[supportIndices] * self.alpha[supportIndices]
+
+    def predict(self,X):
+
 
 
 def split_into_train_and_test(x_all_LF, frac_test=0.5, random_state=None):
