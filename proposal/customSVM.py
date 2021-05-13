@@ -7,6 +7,7 @@ import seaborn as sns
 from scipy import optimize
 
 from sklearn import metrics, svm
+from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score
 
 
@@ -287,6 +288,8 @@ def main():
     # testObject.newAxis(X,y)
     xTrain,yTrain,xTest,yTest = csvToArray()
     model = svm.SVC(kernel='rbf', C=10, gamma=1/2, shrinking=False)
+    clf = MLPClassifier(solver='lbfgs', alpha=1e-5,
+                        hidden_layer_sizes=(5, 2), random_state=1)
     trainAndTest(model, xTrain,yTrain,xTest,yTest)
 
 if __name__ == "__main__":
