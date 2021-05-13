@@ -6,7 +6,7 @@ import math
 import seaborn as sns
 from scipy import optimize
 
-from sklearn import metrics
+from sklearn import metrics, svm
 from sklearn.metrics import accuracy_score
 
 
@@ -235,7 +235,7 @@ def csvToArray():
     # print(type(df))
     # print(df.shape)
 
-    train_MF, test_NF = split_into_train_and_test(df, frac_test=0.95, random_state=np.random.RandomState(0))
+    train_MF, test_NF = split_into_train_and_test(df, frac_test=0.3, random_state=np.random.RandomState(0))
     xTest = test_NF[:, :-1]
     yTest = test_NF[:, -1]
 
@@ -249,10 +249,10 @@ def csvToArray():
     # print(yTrain)
     # print(yTrain.shape)
     #print correlation map
-
+    return xTrain,yTrain,xTest,yTest
+def trainAndTest(model,xTrain,yTrain,xTest,yTest):
     # plotSvm(xTrain2DPlot,yTrain)
-    model30 = KernelSvm(C= 5, kernel=EXPON)
-    model30.fit(xTrain,yTrain)
+    model.fit(xTrain, yTrain)
 
     # fig, axes = plt.subplots(1, 2, figsize=(16, 3))
     # for model,  title in zip([model30,model30], ['Custom linear SVM','Custom linear SVM']):
@@ -264,9 +264,10 @@ def csvToArray():
     # yEst = model30.predict(xTest)
     # plotConfusionMatrix(yTest,yEst,colors,"title is nan", ax)
 
-    print(yTrain)
-    print(model30.predict(xTrain))
-    # print(accuracy_score(yTrain,model30.predict(xTrain), normalize= False))
+    # print(yTrain)
+    # print(yTrain.shape)
+    # print(model.predict(xTrain))
+    print(accuracy_score(yTest,model.predict(xTest)))
 
 
 
@@ -284,7 +285,9 @@ def main():
     # fig, ax = plt.subplots(1, figsize=(11, 7))
     # plotSvm(xTrain,yTrain, support=model30.supportVectors, label='Training', ax=ax)
     # testObject.newAxis(X,y)
-    csvToArray()
+    xTrain,yTrain,xTest,yTest = csvToArray()
+    model = svm.SVC(kernel='rbf', C=10, gamma=1/2, shrinking=False)
+    trainAndTest(model, xTrain,yTrain,xTest,yTest)
 
 if __name__ == "__main__":
     main()
