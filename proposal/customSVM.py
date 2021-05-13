@@ -6,6 +6,9 @@ import math
 import seaborn as sns
 from scipy import optimize
 
+from sklearn import metrics
+from sklearn.metrics import accuracy_score
+
 
 def plotLine(ax, xRange, w, x0, label, color='grey', linestyle='-', alpha=1.):
     """ Plot a (separating) line given the normal vector (weights) and point of intercept """
@@ -21,7 +24,7 @@ def plotSvm(X, y, support=None, w=None, intercept=0., label='Data', separatorLab
     if ax is None:
         fig, ax = plt.subplots(1)
 
-    im = ax.scatter(X[:, 0], X[:, 1], c=y, cmap=cmap, alpha=0.5, label=label)
+    im = ax.scatter(X[:, 0], X[:, 22], c=y, cmap=cmap, alpha=0.5, label=label)
     if support is not None:
         ax.scatter(support[:, 0], support[:, 1], label='Support', s=80, facecolors='none',
                    edgecolors='y', color='y')
@@ -50,6 +53,30 @@ def plotSvm(X, y, support=None, w=None, intercept=0., label='Data', separatorLab
     cb.set_ticklabels(['-1', '1'])
 
     plt.show()
+
+
+def plotHeatMap(X, classes, title=None, fmt='.2g', ax=None, xlabel=None, ylabel=None):
+    """ Fix heatmap plot from Seaborn with pyplot 3.1.0, 3.1.1
+        https://stackoverflow.com/questions/56942670/matplotlib-seaborn-first-and-last-row-cut-in-half-of-heatmap-plot
+    """
+    ax = sns.heatmap(X, xticklabels=classes, yticklabels=classes, annot=True,
+                     fmt=fmt, cmap=plt.cm.Blues, ax=ax)  # notation: "annot" not "annote"
+    bottom, top = ax.get_ylim()
+    ax.set_ylim(bottom + 0.5, top - 0.5)
+    if title:
+        ax.set_title(title)
+    if xlabel:
+        ax.set_xlabel(xlabel)
+    if ylabel:
+        ax.set_ylabel(ylabel)
+
+    plt.show()
+
+
+def plotConfusionMatrix(yTrue, yEst, classes, title=None, fmt='.2g', ax=None):
+    plotHeatMap(metrics.confusion_matrix(yTrue, yEst), classes, title, fmt, ax, xlabel='Estimations',
+                ylabel='True values')
+
 class customizedKernelSVM:
     def __init__(self,C):
         pass
@@ -131,7 +158,21 @@ class KernelSvm:
         self.supportAlphaY = y[supportIndices] * self.alpha[supportIndices]
 
     def predict(self,X):
+        def predict1(x):
+            x1 = np.apply_along_axis(lambda s:self.kernel(s,x),1,self.supportVectors)
+            x2 = x1 * self.supportAlphaY
+            return np.sum(x2)
+        d = np.apply_along_axis(predict1, 1,X)
+        return 2 *(d>0) -1
 
+def GRBF(x1, x2):
+    diff = x1 - x2
+    return np.exp(-np.dot(diff,diff)*len(x1)/2)
+def EXPON(x1,x2):
+    sigma = 10
+    return np.exp(-1*np.sum((x1-x2)**2)**0.5/(2*sigma**2))
+def LINEAR(x1, x2):
+    return (x1*x2)+1
 
 
 def split_into_train_and_test(x_all_LF, frac_test=0.5, random_state=None):
@@ -192,9 +233,9 @@ def csvToArray():
     # heat map is used for illustration
     # heatmap(df)
     # print(type(df))
-    # print(df.head())
+    # print(df.shape)
 
-    train_MF, test_NF = split_into_train_and_test(df, frac_test=0.3, random_state=np.random.RandomState(0))
+    train_MF, test_NF = split_into_train_and_test(df, frac_test=0.95, random_state=np.random.RandomState(0))
     xTest = test_NF[:, :-1]
     yTest = test_NF[:, -1]
 
@@ -203,13 +244,31 @@ def csvToArray():
 
     xTrain2DPlot = train_MF[:, [0,22]]
     # the above is 2d X
-    print(xTrain2DPlot)
-    print(xTrain2DPlot.shape)
+    # print(xTrain2DPlot)
+    # print(xTrain2DPlot.shape)
     # print(yTrain)
     # print(yTrain.shape)
     #print correlation map
 
-    plotSvm(xTrain2DPlot,yTrain)
+    # plotSvm(xTrain2DPlot,yTrain)
+    model30 = KernelSvm(C= 5, kernel=EXPON)
+    model30.fit(xTrain,yTrain)
+
+    # fig, axes = plt.subplots(1, 2, figsize=(16, 3))
+    # for model,  title in zip([model30,model30], ['Custom linear SVM','Custom linear SVM']):
+    #     yEst = model30.predict(xTest)
+    #     plotConfusionMatrix(yTest, yEst, colors, "title is nan")
+
+    # fig, ax = plt.subplots(1, figsize=(11, 7))
+    # plotSvm(xTrain,yTrain, support=model30.supportVectors, label='Training', ax=ax)
+    # yEst = model30.predict(xTest)
+    # plotConfusionMatrix(yTest,yEst,colors,"title is nan", ax)
+
+    print(yTrain)
+    print(model30.predict(xTrain))
+    # print(accuracy_score(yTrain,model30.predict(xTrain), normalize= False))
+
+
 
 
 colors = ['blue','red']
@@ -219,7 +278,11 @@ N = 100
 
 def main():
     # testObject = testNumpyFeature()
-    # X, y = generateBatchBipolar(10)
+    # xTrain, yTrain = generateBatchBipolar(1000)
+    # model30 = KernelSvm(C= 5, kernel=GRBF)
+    # model30.fit(xTrain,yTrain)
+    # fig, ax = plt.subplots(1, figsize=(11, 7))
+    # plotSvm(xTrain,yTrain, support=model30.supportVectors, label='Training', ax=ax)
     # testObject.newAxis(X,y)
     csvToArray()
 
