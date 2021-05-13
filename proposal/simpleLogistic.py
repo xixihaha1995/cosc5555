@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+from numpy.random import rand
 from sklearn import metrics
 from collections import Counter
 
@@ -120,68 +121,45 @@ def sgaLogistic(epoch,stepSize,fakeOnlineTrainX,fakeOnlineTrainY,xTest,yTest):
 
     return AlltimeWeight,aveLoss,l2Weights,SSEArr
 
-# print("original data")
-bank = pd.read_csv("bank.csv",delimiter=';')
-# print(bank.head())
-# print("after oneHotEncoding")
-df = oneHotEnc(bank)
-df.rename(columns = {0:'y'}, inplace = True)
-# print(type(df))
-# print(df.head())
-
-train_MF, test_NF = split_into_train_and_test(df, frac_test=0.3, random_state=np.random.RandomState(0))
-xTest = test_NF[:,:-1]
-yTest = test_NF[:,-1]
-
-print(type(xTest))
-# print(np.count_nonzero(yTest))
-xTrain = train_MF[:,:-1]
-yTrain = train_MF[:,-1]
-# print(xTrain)
-# print(yTrain)
-# minMax normalization
-xTrain = (xTrain - np.min(xTrain,axis = 0))/(np.max(xTrain,axis = 0)-np.min(xTrain,axis = 0))
-xTest = (xTest - np.min(xTest,axis = 0))/(np.max(xTest,axis = 0)-np.min(xTest,axis = 0))
-# print(xTrain)
-# print(Counter(yTest))
-# print(np.count_nonzero(yTest))
-#
-fig = plt.figure()
-ax1 = fig.add_subplot(131)
-ax2 = fig.add_subplot(132)
-ax3 = fig.add_subplot(133)
-
-bestModel = [[],0,0,0]
-minTestSSE = 1e10
-for stepSize in [1e-1,1e-2,1e-3,1e-4,1e-5,1e-6]:
-    AlltimeWeightLogistic, aveLossLogistic, l2WeightsLogistic, SSEArrLogistic = sgaLogistic(100000,stepSize,xTrain,yTrain,xTest,yTest)
-
-    if np.min(SSEArrLogistic) < minTestSSE:
-        minTestSSE = np.min(aveLossLogistic)
-        timp100 = np.argmin(aveLossLogistic)
-        bestModel[0] =  AlltimeWeightLogistic[timp100]
-        bestModel[1] = stepSize
-        bestModel[2] = timp100*100
-        bestModel[3] = minTestSSE
-
-    ax1.plot(aveLossLogistic,label = "eta= "+str(stepSize))
-    ax2.plot(l2WeightsLogistic,label = "eta= "+str(stepSize))
-    ax3.plot(SSEArrLogistic,label = "eta= "+str(stepSize))
-
-    ax1.set_ylabel("aveLossLogistic")
-    ax2.set_ylabel("l2WeightsLogistic")
-    ax3.set_ylabel("SSELogistic")
-    legend1 = ax1.legend(fontsize='x-large')
-    legend2 = ax2.legend(fontsize='x-large')
-    legend3 = ax3.legend(fontsize='x-large')
+class logisticRegression:
+    def fit(self,X,y):
+        loss = []
+        weights = n
+    def sigmod(self,z):
+        return 1 / (1+np.e**(-z))
+    def costFunction(self,X,y,weights):
+        z = np.dot(X,weights)
+        # prediction = self.sigmod(z)
+        # SSE = np.sum((y - np.where(prediction > 0.5, 1, 0)) ** 2)
+        predict1 = y* np.log(self.sigmod(z))
+        predict0 = (1-y)*np.log(1-self.sigmod(z))
+        return -np.sum(predict0+predict1) / len(X)
 
 
+def main():
+    # print("original data")
+    bank = pd.read_csv("bank.csv", delimiter=';')
+    # print(bank.head())
+    # print("after oneHotEncoding")
+    df = oneHotEnc(bank)
+    df.rename(columns={0: 'y'}, inplace=True)
+    # print(type(df))
+    # print(df.head())
 
-plt.show()
-pred = predicted(xTest,bestModel[0],1)
-fpr, tpr, thresholds = metrics.roc_curve(yTest, pred)
-print(bestModel)
-print(metrics.auc(fpr, tpr))
+    train_MF, test_NF = split_into_train_and_test(df, frac_test=0.3, random_state=np.random.RandomState(0))
+    xTest = test_NF[:, :-1]
+    yTest = test_NF[:, -1]
 
+    print(type(xTest))
+    # print(np.count_nonzero(yTest))
+    xTrain = train_MF[:, :-1]
+    yTrain = train_MF[:, -1]
+
+    xTrain = (xTrain - np.min(xTrain, axis=0)) / (np.max(xTrain, axis=0) - np.min(xTrain, axis=0))
+    xTest = (xTest - np.min(xTest, axis=0)) / (np.max(xTest, axis=0) - np.min(xTest, axis=0))
+
+
+if __name__ == "__main__":
+    main()
 
 

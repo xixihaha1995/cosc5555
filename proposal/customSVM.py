@@ -236,7 +236,7 @@ def csvToArray():
     # print(type(df))
     # print(df.shape)
 
-    train_MF, test_NF = split_into_train_and_test(df, frac_test=0.3, random_state=np.random.RandomState(0))
+    train_MF, test_NF = split_into_train_and_test(df, frac_test=0.95, random_state=np.random.RandomState(0))
     xTest = test_NF[:, :-1]
     yTest = test_NF[:, -1]
 
@@ -287,10 +287,11 @@ def main():
     # plotSvm(xTrain,yTrain, support=model30.supportVectors, label='Training', ax=ax)
     # testObject.newAxis(X,y)
     xTrain,yTrain,xTest,yTest = csvToArray()
-    model = svm.SVC(kernel='rbf', C=10, gamma=1/2, shrinking=False)
+    model30 = KernelSvm(C= 5, kernel=GRBF)
+    model = svm.SVC(kernel='rbf')
     clf = MLPClassifier(solver='lbfgs', alpha=1e-5,
                         hidden_layer_sizes=(5, 2), random_state=1)
-    trainAndTest(model, xTrain,yTrain,xTest,yTest)
+    trainAndTest(model30, xTrain,yTrain,xTest,yTest)
 
 if __name__ == "__main__":
     main()
