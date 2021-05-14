@@ -139,7 +139,7 @@ def bestCustom(xTrain, yTrain, yTest, xTest):
 def multiConfusionPlot(X_train, X_test, y_train, y_test ):
     classifiers = {
         "customLogistic": CustomlogisticRegression(),
-        "LogisiticRegression": LogisticRegression(),
+        "LogisiticRegression": LogisticRegression(max_iter=1e4),
         "KNearest": KNeighborsClassifier(),
         "Support Vector Classifier": SVC(),
         "MLPClassifier": MLPClassifier(),
@@ -167,7 +167,7 @@ def multiConfusionPlot(X_train, X_test, y_train, y_test ):
 
     f.text(0.4, 0.1, 'Predicted label', ha='left')
     plt.subplots_adjust(wspace=0.40, hspace=0.1)
-    f.suptitle("BalancedOneHotMinMax")
+    f.suptitle("imBalancedOneHotMinMax")
     f.colorbar(disp.im_, ax=axes)
     plt.show()
 
@@ -183,7 +183,7 @@ def main():
     # print(dfOnehot.head())
     # print(dfOnehot.columns)
 
-    df = imbalanced(df)
+    # df = imbalanced(df)
     # print(type(df))
     # print(df.head())
 
