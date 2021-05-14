@@ -49,7 +49,7 @@ def oneHotEnc(bank):
 
 
 def labelEncoding(bank):
-    le = preprocessing.LabelEncoder()
+    # le = preprocessing.LabelEncoder()
     for column in bank:
         if bank[column].dtypes == object:
             # le.fit(bank[column])
@@ -71,83 +71,7 @@ def labelEncoding(bank):
     # print(s)
     return s
 
-def logProb(scores):
-    return 1/(1+np.exp(-scores))
 
-def accuray(xTest,weights,yTest,Bias):
-    if Bias == 1:
-        row, col = xTest.shape
-        dummColumn = np.ones((row,))
-        HBatch = np.column_stack((dummColumn, xTest))
-    else:
-        HBatch = xTest
-    scores = np.dot(HBatch,weights)
-    # print(scores)
-    prediction = logProb(scores)
-    # print(yTest,prediction)
-    SSE = np.sum((yTest - np.where(prediction > 0.5, 1, 0)) ** 2)
-    # print(SSE)
-    # if np.count_nonzero(np.where(prediction > 0.5, 1, 0)) > 0:
-    #     # print("I got 1")
-    return SSE
-
-def predicted(xTest,weights,Bias):
-    if Bias == 1:
-        row, col = xTest.shape
-        dummColumn = np.ones((row,))
-        HBatch = np.column_stack((dummColumn, xTest))
-    else:
-        HBatch = xTest
-    scores = np.dot(HBatch,weights)
-    prediction = logProb(scores)
-
-    return np.where(prediction > 0.5, 1, 0)
-
-
-
-def sgaLogistic(epoch,stepSize,fakeOnlineTrainX,fakeOnlineTrainY,xTest,yTest):
-    row,col = fakeOnlineTrainX.shape
-    dummColumn = np.ones((row,))
-    HBatch = np.column_stack((dummColumn, fakeOnlineTrainX))
-    yBatch = fakeOnlineTrainY
-    weights = np.array([0 for i in range(col+1)])
-    AlltimeWeight = []
-    # print(weight.shape)
-    sumLoss = 0
-    aveLoss = []
-    l2Weights = []
-    SSEArr = []
-    for t in range(epoch):
-        # obser = np.random.randint(row)
-        obser = t % row
-        sample =  HBatch[obser]
-        Ind = yBatch[obser]
-        # print(sample.shape)
-        # return
-        scores = np.dot(sample, weights)
-        prediction = logProb(scores)
-
-        thisPredicated = 0 if prediction < 0.5 else 1
-        thisL2Loss = (Ind - thisPredicated) ** 2
-        sumLoss += thisL2Loss
-
-        if t > 0 and (t%100 == 0):
-            aveLoss.append(sumLoss /t)
-            SSEArr.append(accuray(xTest,weights,yTest,1))
-            AlltimeWeight.append(weights)
-
-
-
-        errSignal =  Ind - prediction
-        gradient = np.dot(sample.T, errSignal)
-        # for j in range
-        weights = weights + stepSize * gradient
-
-        thisL2Weights = np.sqrt(np.sum(weights ** 2))
-        l2Weights.append(thisL2Weights)
-
-
-    return AlltimeWeight,aveLoss,l2Weights,SSEArr
 
 class logisticRegression:
     def fit(self,X,y, epoch = 2e3, lr = 5e-2):
@@ -186,18 +110,34 @@ def imbalanced(data):
     # print(data.loc[data["y"] == 1].index)
     return data
 
+def bestCustom(xTrain, yTrain, yTest, xTest):
+
+    customModel = logisticRegression()
+    maxScore = np.float('-inf')
+    bestLR = 0
+    for lr in [1e-1,1e-2,1e-3,1e-4,1e-5,1e-6]:
+        customModel.fit(xTrain,yTrain,1E4, lr)
+        score = precision_score(yTest, customModel.predict(xTest))
+        if score > maxScore:
+            bestLR = lr
+            maxScore = score
+
+    return bestLR
+
 
 def main():
     # print("original data")
     bank = pd.read_csv("bank.csv", delimiter=';')
     # print(bank.head())
     # print("after oneHotEncoding")
-    # df = oneHotEnc(bank)
-    df = labelEncoding(bank)
-    print(df.head())
-    print(df.columns)
+    df = oneHotEnc(bank)
+    # df = labelEncoding(bank)
+    # print(df.head())
+    # print(df.columns)
+    # print(dfOnehot.head())
+    # print(dfOnehot.columns)
 
-    # df = imbalanced(df)
+    df = imbalanced(df)
     # print(type(df))
     # print(df.head())
 
@@ -212,7 +152,10 @@ def main():
     xTrain = (xTrain - np.min(xTrain, axis=0)) / (np.max(xTrain, axis=0) - np.min(xTrain, axis=0))
     xTest = (xTest - np.min(xTest, axis=0)) / (np.max(xTest, axis=0) - np.min(xTest, axis=0))
 
+
     customModel = logisticRegression()
+    # bestLr = bestCustom(xTrain,yTrain,yTest,xTest)
+
     customModel.fit(xTrain,yTrain,1E3)
     clf = svm.SVC(random_state=0)
     clf.fit(xTrain,yTrain)
@@ -221,7 +164,8 @@ def main():
     dispClf =metrics.ConfusionMatrixDisplay(confusion_matrix=cmClf)
     dispCustom = metrics.ConfusionMatrixDisplay(confusion_matrix=cmCustom)
     dispClf.plot()
-    # dispCustom.plot()
+    dispClf.figure_
+    dispCustom.plot()
 
     print(precision_score(yTest, clf.predict(xTest)))
     plt.show()
