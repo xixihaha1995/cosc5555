@@ -44,6 +44,25 @@ def oneHotEnc(bank):
             s = pd.DataFrame(data=temp)
     return s
 
+
+def labelEncoding(bank):
+    for column in bank:
+        temp = bank.y.astype('category').cat.codes
+        # if column == 'y':
+        #     temp = bank.y.astype('category').cat.codes
+        #     # print(type(temp))
+        # else:
+        #     if bank[column].dtypes == object:
+        #         temp = pd.get_dummies(bank[column], prefix=column)
+        #     else:
+        #         temp =  bank[column]
+        try:
+            # s.append(temp)
+            s = pd.concat([s, temp], axis=1)
+        except NameError:
+            s = pd.DataFrame(data=temp)
+    return s
+
 def logProb(scores):
     return 1/(1+np.exp(-scores))
 
@@ -155,8 +174,8 @@ def imbalanced(data):
     multiInt =(N - dataWithOne.index.size) // dataWithOne.index.size
     for _ in range(multiInt):
         data = data.append(dataWithOne)
-    print(data.index)
-    print(data.loc[data["y"] == 1].index)
+    # print(data.index)
+    # print(data.loc[data["y"] == 1].index)
     return data
 
 
@@ -165,7 +184,9 @@ def main():
     bank = pd.read_csv("bank.csv", delimiter=';')
     # print(bank.head())
     # print("after oneHotEncoding")
-    df = oneHotEnc(bank)
+    # df = oneHotEnc(bank)
+    df = labelEncoding(bank)
+    print(df.head())
     df.rename(columns={0: 'y'}, inplace=True)
     # df = imbalanced(df)
     # print(type(df))
@@ -193,7 +214,7 @@ def main():
     dispClf.plot()
     # dispCustom.plot()
 
-    precision_score(yTest, clf.predict(xTest), average='weighted')
+    print(precision_score(yTest, clf.predict(xTest)))
     plt.show()
 
 
