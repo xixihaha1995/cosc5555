@@ -8,6 +8,14 @@ from sklearn import metrics, svm
 from sklearn.metrics import plot_confusion_matrix, precision_score
 from collections import Counter
 
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import RandomForestClassifier
+import collections
+
 
 
 def split_into_train_and_test(x_all_LF, frac_test=0.5, random_state=None):
@@ -73,9 +81,9 @@ def labelEncoding(bank):
 
 
 
-class logisticRegression:
-    def __int__(self, epoch = None):
-        if epoch == None:
+class CustomlogisticRegression:
+    def __init__(self, epoch = None):
+        if epoch is None:
             self.epoch = 1e3
         else:
             self.epoch = epoch
@@ -117,7 +125,7 @@ def imbalanced(data):
 
 def bestCustom(xTrain, yTrain, yTest, xTest):
 
-    customModel = logisticRegression()
+    customModel = CustomlogisticRegression()
     maxScore = np.float('-inf')
     bestLR = 0
     for lr in [1e-1,1e-2,1e-3,1e-4,1e-5,1e-6]:
@@ -128,27 +136,28 @@ def bestCustom(xTrain, yTrain, yTest, xTest):
             maxScore = score
 
     return bestLR
-def multiConfusionPlot():
+def multiConfusionPlot(X_train, X_test, y_train, y_test ):
     classifiers = {
-        "Naive Bayes": GaussianNB(),
+        "customLogistic": CustomlogisticRegression(),
         "LogisiticRegression": LogisticRegression(),
         "KNearest": KNeighborsClassifier(),
         "Support Vector Classifier": SVC(),
-        "DecisionTreeClassifier": DecisionTreeClassifier(),
+        "MLPClassifier": MLPClassifier(),
     }
 
-    iris = load_iris()
-    X, y = iris.data, iris.target
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y)
 
     f, axes = plt.subplots(1, 5, figsize=(20, 5), sharey='row')
 
     for i, (key, classifier) in enumerate(classifiers.items()):
-        y_pred = classifier.fit(X_train, y_train).predict(X_test)
-        cf_matrix = confusion_matrix(y_test, y_pred)
-        disp = ConfusionMatrixDisplay(cf_matrix,
-                                      display_labels=iris.target_names)
+        # if classifier == CustomlogisticRegression():
+        #     classifier.fit(X_train,y_train)
+        #     y_pred = classifier.predict(X_test)
+        # else:
+        #     y_pred = classifier.fit(X_train, y_train).predict(X_test)
+        classifier.fit(X_train, y_train)
+        y_pred = classifier.predict(X_test)
+        cf_matrix = metrics.confusion_matrix(y_test, y_pred)
+        disp =  metrics.ConfusionMatrixDisplay(cf_matrix)
         disp.plot(ax=axes[i], xticks_rotation=45)
         disp.ax_.set_title(key)
         disp.im_.colorbar.remove()
@@ -158,7 +167,7 @@ def multiConfusionPlot():
 
     f.text(0.4, 0.1, 'Predicted label', ha='left')
     plt.subplots_adjust(wspace=0.40, hspace=0.1)
-
+    f.suptitle("BalancedOneHotMinMax")
     f.colorbar(disp.im_, ax=axes)
     plt.show()
 
@@ -188,24 +197,9 @@ def main():
 
     xTrain = (xTrain - np.min(xTrain, axis=0)) / (np.max(xTrain, axis=0) - np.min(xTrain, axis=0))
     xTest = (xTest - np.min(xTest, axis=0)) / (np.max(xTest, axis=0) - np.min(xTest, axis=0))
+    multiConfusionPlot(xTrain,xTest,yTrain,yTest)
 
 
-    customModel = logisticRegression()
-    # bestLr = bestCustom(xTrain,yTrain,yTest,xTest)
-
-    customModel.fit(xTrain,yTrain)
-    clf = svm.SVC(random_state=0)
-    clf.fit(xTrain,yTrain)
-    cmClf = metrics.confusion_matrix(yTest, clf.predict(xTest))
-    cmCustom = metrics.confusion_matrix(yTest, customModel.predict(xTest))
-    dispClf =metrics.ConfusionMatrixDisplay(confusion_matrix=cmClf)
-    dispCustom = metrics.ConfusionMatrixDisplay(confusion_matrix=cmCustom)
-    dispClf.plot()
-    dispClf.figure_
-    dispCustom.plot()
-
-    print(precision_score(yTest, clf.predict(xTest)))
-    plt.show()
 
 
 if __name__ == "__main__":
