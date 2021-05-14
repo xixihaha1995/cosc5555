@@ -34,7 +34,11 @@ def split_into_train_and_test(x_all_LF, frac_test=0.5, random_state=None):
     # print(np.count_nonzero(x_all_LF[:,-1]))
     # print(x_all_LF.shape)
     # print(np.count_nonzero(x_all_LF.iloc[:,-1]) /x_all_LF.shape[0] )
-
+    labels = ['0','1']
+    plotY = [x_all_LF.shape[0] - np.count_nonzero(x_all_LF.iloc[:,-1]), np.count_nonzero(x_all_LF.iloc[:,-1])]
+    # plt.pie(plotY, labels = labels)
+    # plt.suptitle("Distribution of Imbalanced Class")
+    # plt.show()
     # print(x_train_MF)
     return x_train_MF, x_test_NF
 def oneHotEnc(bank):
@@ -122,6 +126,12 @@ def imbalanced(data):
         data = data.append(dataWithOne)
     # print(data.index)
     # print(data.loc[data["y"] == 1].index)
+
+    labels = ['0','1']
+    plotY = [data.shape[0] - np.count_nonzero(data.iloc[:,-1]), np.count_nonzero(data.iloc[:,-1])]
+    plt.pie(plotY, labels = labels)
+    plt.suptitle("Distribution of balanced Class")
+
     return data
 
 def bestCustom(xTrain, yTrain, yTest, xTest):
@@ -196,7 +206,7 @@ def main():
     # print(dfOnehot.head())
     # print(dfOnehot.columns)
     # heatmap(df)
-    # df = imbalanced(df)
+    df = imbalanced(df)
     # print(type(df))
     # print(df.head())
 
