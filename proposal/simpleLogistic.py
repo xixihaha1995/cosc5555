@@ -138,9 +138,9 @@ def bestCustom(xTrain, yTrain, yTest, xTest):
     return bestLR
 def multiConfusionPlot(X_train, X_test, y_train, y_test ):
     classifiers = {
-        "customLogistic": CustomlogisticRegression(),
-        "LogisiticRegression": LogisticRegression(max_iter=1e4),
-        "KNearest": KNeighborsClassifier(),
+        # "customLogistic": CustomlogisticRegression(),
+        # "LogisiticRegression": LogisticRegression(max_iter=1e4),
+        # "KNearest": KNeighborsClassifier(),
         "Support Vector Classifier": SVC(),
         "MLPClassifier": MLPClassifier(),
     }
@@ -183,7 +183,7 @@ def main():
     # print(dfOnehot.head())
     # print(dfOnehot.columns)
 
-    # df = imbalanced(df)
+    df = imbalanced(df)
     # print(type(df))
     # print(df.head())
 
