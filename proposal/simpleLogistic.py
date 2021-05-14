@@ -66,8 +66,8 @@ def labelEncoding(bank):
             s = pd.concat([s, temp], axis=1)
         except NameError:
             s = pd.DataFrame(data=temp)
-        if column == 'y':
-            s.rename(columns={0: 'y'}, inplace=True)
+
+        s.rename(columns={0: column}, inplace=True)
     # print(s)
     return s
 
@@ -195,6 +195,7 @@ def main():
     # df = oneHotEnc(bank)
     df = labelEncoding(bank)
     print(df.head())
+    print(df.columns)
 
     # df = imbalanced(df)
     # print(type(df))
