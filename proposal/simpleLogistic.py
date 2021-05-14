@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+import seaborn as sns
 from numpy.random import rand
 from sklearn import preprocessing
 from sklearn import metrics, svm
@@ -138,9 +139,9 @@ def bestCustom(xTrain, yTrain, yTest, xTest):
     return bestLR
 def multiConfusionPlot(X_train, X_test, y_train, y_test ):
     classifiers = {
-        # "customLogistic": CustomlogisticRegression(),
-        # "LogisiticRegression": LogisticRegression(max_iter=1e4),
-        # "KNearest": KNeighborsClassifier(),
+        "customLogistic": CustomlogisticRegression(),
+        "LogisiticRegression": LogisticRegression(max_iter=1e4),
+        "KNearest": KNeighborsClassifier(),
         "Support Vector Classifier": SVC(),
         "MLPClassifier": MLPClassifier(),
     }
@@ -159,7 +160,11 @@ def multiConfusionPlot(X_train, X_test, y_train, y_test ):
         cf_matrix = metrics.confusion_matrix(y_test, y_pred)
         disp =  metrics.ConfusionMatrixDisplay(cf_matrix)
         disp.plot(ax=axes[i], xticks_rotation=45)
-        disp.ax_.set_title(key)
+
+        fpr, tpr, thresholds = metrics.roc_curve(y_test, y_pred)
+        aucScore = metrics.auc(fpr, tpr)
+
+        disp.ax_.set_title(key+":"+"{:.2e}".format(aucScore))
         disp.im_.colorbar.remove()
         disp.ax_.set_xlabel('')
         if i != 0:
@@ -167,8 +172,16 @@ def multiConfusionPlot(X_train, X_test, y_train, y_test ):
 
     f.text(0.4, 0.1, 'Predicted label', ha='left')
     plt.subplots_adjust(wspace=0.40, hspace=0.1)
+    "imBalancedOneHotMinMax"
+    "BalancedOneHotMinMax"
+    "BalancedCategoricalMinMax"
     f.suptitle("imBalancedOneHotMinMax")
     f.colorbar(disp.im_, ax=axes)
+    plt.show()
+
+def heatmap(data):
+    corr = data.corr()
+    sns.heatmap(corr,annot = True)
     plt.show()
 
 def main():
@@ -182,8 +195,8 @@ def main():
     # print(df.columns)
     # print(dfOnehot.head())
     # print(dfOnehot.columns)
-
-    df = imbalanced(df)
+    # heatmap(df)
+    # df = imbalanced(df)
     # print(type(df))
     # print(df.head())
 
