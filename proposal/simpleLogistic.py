@@ -74,12 +74,17 @@ def labelEncoding(bank):
 
 
 class logisticRegression:
-    def fit(self,X,y, epoch = 2e3, lr = 5e-2):
+    def __int__(self, epoch = None):
+        if epoch == None:
+            self.epoch = 1e3
+        else:
+            self.epoch = epoch
+    def fit(self,X,y, lr = 5e-2):
         loss = []
         weights = rand(X.shape[1])
         N = len(X)
 
-        for _ in range(int(epoch)):
+        for _ in range(int(self.epoch)):
             y_hat = self.sigmod(np.dot(X,weights))
             weights += lr*np.dot(X.T, y-y_hat) / N
             loss.append(self.costFunction(X,y,weights))
@@ -123,7 +128,39 @@ def bestCustom(xTrain, yTrain, yTest, xTest):
             maxScore = score
 
     return bestLR
+def multiConfusionPlot():
+    classifiers = {
+        "Naive Bayes": GaussianNB(),
+        "LogisiticRegression": LogisticRegression(),
+        "KNearest": KNeighborsClassifier(),
+        "Support Vector Classifier": SVC(),
+        "DecisionTreeClassifier": DecisionTreeClassifier(),
+    }
 
+    iris = load_iris()
+    X, y = iris.data, iris.target
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+    f, axes = plt.subplots(1, 5, figsize=(20, 5), sharey='row')
+
+    for i, (key, classifier) in enumerate(classifiers.items()):
+        y_pred = classifier.fit(X_train, y_train).predict(X_test)
+        cf_matrix = confusion_matrix(y_test, y_pred)
+        disp = ConfusionMatrixDisplay(cf_matrix,
+                                      display_labels=iris.target_names)
+        disp.plot(ax=axes[i], xticks_rotation=45)
+        disp.ax_.set_title(key)
+        disp.im_.colorbar.remove()
+        disp.ax_.set_xlabel('')
+        if i != 0:
+            disp.ax_.set_ylabel('')
+
+    f.text(0.4, 0.1, 'Predicted label', ha='left')
+    plt.subplots_adjust(wspace=0.40, hspace=0.1)
+
+    f.colorbar(disp.im_, ax=axes)
+    plt.show()
 
 def main():
     # print("original data")
@@ -156,7 +193,7 @@ def main():
     customModel = logisticRegression()
     # bestLr = bestCustom(xTrain,yTrain,yTest,xTest)
 
-    customModel.fit(xTrain,yTrain,1E3)
+    customModel.fit(xTrain,yTrain)
     clf = svm.SVC(random_state=0)
     clf.fit(xTrain,yTrain)
     cmClf = metrics.confusion_matrix(yTest, clf.predict(xTest))
