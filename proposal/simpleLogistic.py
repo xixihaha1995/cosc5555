@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 from numpy.random import rand
+from sklearn import preprocessing
 from sklearn import metrics, svm
 from sklearn.metrics import plot_confusion_matrix, precision_score
 from collections import Counter
@@ -42,25 +43,32 @@ def oneHotEnc(bank):
             s = pd.concat([s, temp], axis=1)
         except NameError:
             s = pd.DataFrame(data=temp)
+
+    s.rename(columns={0: 'y'}, inplace=True)
     return s
 
 
 def labelEncoding(bank):
+    le = preprocessing.LabelEncoder()
     for column in bank:
-        temp = bank.y.astype('category').cat.codes
-        # if column == 'y':
-        #     temp = bank.y.astype('category').cat.codes
-        #     # print(type(temp))
-        # else:
-        #     if bank[column].dtypes == object:
-        #         temp = pd.get_dummies(bank[column], prefix=column)
-        #     else:
-        #         temp =  bank[column]
+        if bank[column].dtypes == object:
+            # le.fit(bank[column])
+            # temp = le.transform(bank[column])
+            # bank[column].astype('category')
+            temp =bank[column].astype('category').cat.codes
+            # print(le.transform(bank[column]))
+            # temp = bank.y.astype('category').cat.codes
+            # print(temp)
+        else:
+            temp =  bank[column]
         try:
             # s.append(temp)
             s = pd.concat([s, temp], axis=1)
         except NameError:
             s = pd.DataFrame(data=temp)
+        if column == 'y':
+            s.rename(columns={0: 'y'}, inplace=True)
+    # print(s)
     return s
 
 def logProb(scores):
@@ -187,7 +195,7 @@ def main():
     # df = oneHotEnc(bank)
     df = labelEncoding(bank)
     print(df.head())
-    df.rename(columns={0: 'y'}, inplace=True)
+
     # df = imbalanced(df)
     # print(type(df))
     # print(df.head())
