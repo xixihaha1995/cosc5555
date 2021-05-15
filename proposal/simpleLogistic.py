@@ -65,13 +65,10 @@ def labelEncoding(bank):
     # le = preprocessing.LabelEncoder()
     for column in bank:
         if bank[column].dtypes == object:
-            # le.fit(bank[column])
-            # temp = le.transform(bank[column])
-            # bank[column].astype('category')
-            temp =bank[column].astype('category').cat.codes
-            # print(le.transform(bank[column]))
-            # temp = bank.y.astype('category').cat.codes
-            # print(temp)
+            if column == 'month':
+                temp = bank[column].astype('category').cat.reorder_categories([ 'jan','feb','mar','apr', 'may', 'jun','jul', 'aug', 'sep','oct', 'nov', 'dec']).cat.codes
+            else:
+                temp = bank[column].astype('category').cat.codes
         else:
             temp =  bank[column]
         try:
@@ -199,8 +196,8 @@ def main():
     bank = pd.read_csv("bank.csv", delimiter=';')
     # print(bank.head())
     # print("after oneHotEncoding")
-    df = oneHotEnc(bank)
-    # df = labelEncoding(bank)
+    # df = oneHotEnc(bank)
+    df = labelEncoding(bank)
     # print(df.head())
     # print(df.columns)
     # print(dfOnehot.head())
