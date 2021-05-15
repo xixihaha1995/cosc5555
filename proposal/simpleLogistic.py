@@ -182,7 +182,7 @@ def multiConfusionPlot(X_train, X_test, y_train, y_test ):
     "imBalancedOneHotMinMax"
     "BalancedOneHotMinMax"
     "BalancedCategoricalMinMax"
-    f.suptitle("imBalancedOneHotMinMax")
+    f.suptitle("BalancedLabelMinMax")
     f.colorbar(disp.im_, ax=axes)
     plt.show()
 
